@@ -1,0 +1,10 @@
+{
+  "extends": "nitro/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "moduleResolution": "bundler",
+    "types": ["vite/client"]
+  },
+  "include": ["src/**/*", "server/**/*", "entry-server.ts", "vite.config.ts", "nitro.config.ts"]
+}
