@@ -182,7 +182,7 @@ function GraphActivity({
         {/* Focusable so keyboard users can scroll the grid on narrow screens. */}
         <div
           aria-label={`${title}, ${summary}`}
-          className="scrollbar-graph overflow-x-auto outline-none focus-visible:outline-1 focus-visible:outline-graph-accent focus-visible:outline-dashed"
+          className="scrollbar-graph overflow-x-auto"
           role="region"
           tabIndex={0}
         >

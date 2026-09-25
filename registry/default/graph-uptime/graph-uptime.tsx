@@ -77,7 +77,7 @@ function GraphUptime({
         {/* Focusable so keyboard users can scroll the grid on narrow screens. */}
         <div
           aria-label={title}
-          className="flex scrollbar-graph w-fit max-w-full flex-col gap-4 overflow-x-auto outline-none focus-visible:outline-1 focus-visible:outline-graph-accent focus-visible:outline-dashed"
+          className="flex scrollbar-graph w-fit max-w-full flex-col gap-4 overflow-x-auto"
           role="region"
           tabIndex={0}
         >
