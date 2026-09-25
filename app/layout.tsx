@@ -41,7 +41,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ViewScript />
       </head>
       <body className="min-h-dvh font-mono">
-        <ViewSwitch className="fixed top-4 right-4 z-50 sm:top-6 sm:right-8" />
+        <header className="fixed top-4 right-4 z-50 sm:top-6 sm:right-8">
+          <ViewSwitch />
+        </header>
         {children}
       </body>
     </html>

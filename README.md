@@ -20,6 +20,21 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Homepage checks
+
+[agent-browser](https://agent-browser.dev) is a dev dependency. `test:home`
+serves the production build and checks both views of `/`: zero axe-core
+violations and "good" Core Web Vitals. It writes screenshots to
+`artifacts/home/`, plus `home.mp4` with `RECORD=1`.
+
+```bash
+bun run build && bun run test:home
+BASE_URL=https://tino.software bun run test:home   # check a deployment
+```
+
+CI runs it on every PR and posts the screenshots and video as a comment
+(media is stored on the `pr-media` branch).
+
 ## GitHub stats
 
 `lib/github.ts` pulls profile, repos, and recent public events for `gravitinos`.
