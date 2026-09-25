@@ -26,7 +26,10 @@ export function PixelWord({
   return (
     <button
       type="button"
-      onClick={() => setBase((b) => (b + 1) % VARIANTS.length)}
+      onClick={() => {
+        setBase((b) => (b + 1) % VARIANTS.length)
+        setHovered(null)
+      }}
       onMouseLeave={() => setHovered(null)}
       aria-label={`${text}, set in Geist Pixel ${VARIANTS[base].name}. Click to change.`}
       className={cn(
