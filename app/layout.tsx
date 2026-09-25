@@ -9,6 +9,8 @@ import {
 } from "geist/font/pixel"
 import { GeistSans } from "geist/font/sans"
 
+import { ViewScript } from "@/components/view-mode"
+import { ViewSwitch } from "@/components/view-switch"
 import { cn } from "@/lib/utils"
 
 import "./globals.css"
@@ -23,6 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "dark antialiased",
         GeistSans.variable,
@@ -34,7 +37,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         GeistPixelLine.variable
       )}
     >
-      <body className="min-h-dvh font-mono">{children}</body>
+      <head>
+        <ViewScript />
+      </head>
+      <body className="min-h-dvh font-mono">
+        <ViewSwitch className="fixed top-4 right-4 z-50 sm:top-6 sm:right-8" />
+        {children}
+      </body>
     </html>
   )
 }

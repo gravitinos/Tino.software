@@ -25,7 +25,15 @@ Open [http://localhost:3000](http://localhost:3000).
 Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
 otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
 (no scopes needed) also lifts the 60 req/h unauthenticated rate limit.
-If GitHub is unreachable, the page still renders with fallbacks.
+If GitHub is unreachable, the stats block is hidden.
+
+## Markdown view
+
+Every page renders an HTML and a raw-markdown version; the `[ html / md ]`
+switch (or `m`, or `?view=md`) flips `data-view` on `<html>`. An inline script
+applies the saved choice before first paint. The home page markdown is also
+served at `/index.md`. Figures in markdown use the mdxcn ASCII renderers from
+`registry/default/graph-knap`.
 
 ## mdxcn
 
