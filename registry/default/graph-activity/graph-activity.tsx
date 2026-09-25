@@ -179,7 +179,13 @@ function GraphActivity({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-4">
-        <div className="scrollbar-graph overflow-x-auto">
+        {/* Focusable so keyboard users can scroll it when it overflows. */}
+        <div
+          aria-label="Contribution calendar"
+          className="scrollbar-graph overflow-x-auto"
+          role="group"
+          tabIndex={0}
+        >
           <div
             className="flex w-full flex-col gap-1 pr-[2ch]"
             style={{ minWidth: `max(100%, ${weeks.length + 4}ch)` }}

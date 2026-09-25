@@ -74,7 +74,13 @@ function GraphUptime({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col items-center gap-4">
-        <div className="flex scrollbar-graph w-fit max-w-full flex-col gap-4 overflow-x-auto">
+        {/* Focusable so keyboard users can scroll it when it overflows. */}
+        <div
+          aria-label="Uptime history"
+          className="flex scrollbar-graph w-fit max-w-full flex-col gap-4 overflow-x-auto"
+          role="group"
+          tabIndex={0}
+        >
           <div aria-hidden="true" className="flex flex-col gap-1 select-none">
             {rows.map((row, rowIndex) => (
               <div
