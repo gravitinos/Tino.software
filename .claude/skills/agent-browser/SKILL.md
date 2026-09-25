@@ -52,4 +52,4 @@ The dashboard runs independently of browser sessions on port 4848 and can also b
 
 ## In this repo
 
-`agent-browser` is a devDependency: run it as `bunx agent-browser …` (no global install). In Claude Code on the web, Chrome for Testing can't be downloaded; set `AGENT_BROWSER_EXECUTABLE_PATH=/opt/pw-browsers/chromium`. `record` needs `ffmpeg` on PATH. The homepage gate is `bun run build && bun run test:home` (`scripts/check-home.mjs`); CLAUDE.md has the rules for a11y, vitals, and sharing screenshots/video.
+`agent-browser` is a devDependency: run it as `bunx agent-browser …` (no global install). In Claude Code on the web the SessionStart hook (`.claude/hooks/session-start.sh`) points it at the preinstalled Chromium and installs `ffmpeg` for `record`. The homepage gate is `bun run build && bun run test:home` (`scripts/check-home.mjs`); CLAUDE.md has the rules for a11y, vitals, and sharing screenshots/video.
