@@ -24,7 +24,7 @@ export default async function Page() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 sm:px-8">
-      <Swappable markdown={homeMarkdown(gh)}>
+      <Swappable title="tino" markdown={homeMarkdown(gh)}>
         <main className="flex flex-1 flex-col gap-16 py-20 sm:py-32">
           <section className="flex flex-col gap-8">
             <h1>

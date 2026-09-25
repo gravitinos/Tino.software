@@ -25,3 +25,6 @@ npm-debug.log*
 
 # local references
 reference/effect-v3
+
+# agent-browser output (screenshots, videos)
+/artifacts

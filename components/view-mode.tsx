@@ -17,18 +17,24 @@ export function ViewScript() {
 
 /** Renders a page both ways; `data-view` on <html> decides which is visible. */
 export function Swappable({
+  title,
   markdown,
   children,
 }: {
+  /** Page heading for the markdown view, read by screen readers only. */
+  title: string
   markdown: string
   children: ReactNode
 }) {
   return (
     <>
       <div className="contents in-data-[view=md]:hidden">{children}</div>
-      <pre className="hidden flex-1 overflow-x-auto py-20 text-sm leading-relaxed whitespace-pre text-contrast-70 in-data-[view=md]:block sm:py-32">
-        {markdown}
-      </pre>
+      <main className="hidden flex-1 in-data-[view=md]:block">
+        <h1 className="sr-only">{title}</h1>
+        <pre className="overflow-x-auto py-20 text-sm leading-relaxed whitespace-pre text-contrast-70 sm:py-32">
+          {markdown}
+        </pre>
+      </main>
     </>
   )
 }

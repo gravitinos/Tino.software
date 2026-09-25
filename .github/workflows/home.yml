@@ -1,0 +1,112 @@
+name: home
+
+# Homepage gate (axe a11y + Core Web Vitals via agent-browser). On PRs from
+# this repo it also posts screenshots and a short video as a sticky comment;
+# the media is stored on the `pr-media` branch so it renders inline.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: home-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: bun install --frozen-lockfile
+      - name: Browser and ffmpeg for agent-browser
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          bunx agent-browser install
+      - run: bun run build
+
+      - name: test:home
+        run: |
+          set -o pipefail
+          RECORD=1 bun run test:home 2>&1 | tee "$RUNNER_TEMP/test-home.log"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: home
+          path: artifacts/home
+          if-no-files-found: ignore
+
+      - name: Push media to pr-media
+        id: media
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('artifacts/home/*') != ''
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          dir="pr-$PR/${SHA::7}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin pr-media >/dev/null; then
+            git fetch --depth 1 origin pr-media
+            git worktree add -B pr-media "$RUNNER_TEMP/media" FETCH_HEAD
+          else
+            git worktree add --orphan -b pr-media "$RUNNER_TEMP/media"
+          fi
+          cd "$RUNNER_TEMP/media"
+          mkdir -p "$dir" && cp "$GITHUB_WORKSPACE"/artifacts/home/* "$dir"/
+          git add -A && git commit -qm "media for #$PR at ${SHA::7}"
+          for i in 1 2 3; do
+            git push -q origin pr-media && break
+            git pull -q --rebase origin pr-media
+          done
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+
+      - name: Comment
+        if: always() && steps.media.outputs.dir
+        uses: actions/github-script@v7
+        env:
+          DIR: ${{ steps.media.outputs.dir }}
+        with:
+          script: |
+            const fs = require("fs")
+            const marker = "<!-- home-check -->"
+            const { owner, repo } = context.repo
+            const raw = `https://raw.githubusercontent.com/${owner}/${repo}/pr-media/${process.env.DIR}`
+            let log = ""
+            try { log = fs.readFileSync(`${process.env.RUNNER_TEMP}/test-home.log`, "utf8").trim() } catch {}
+            const ok = /homepage ok/.test(log)
+            const video = fs.existsSync("artifacts/home/home.mp4")
+              ? `\n\n[▶ walkthrough video](${raw}/home.mp4)`
+              : ""
+            const body = [
+              marker,
+              `### Homepage ${ok ? "✅ a11y + vitals ok" : "❌ a11y / vitals failing"} · ${process.env.DIR.split("/")[1]}`,
+              "",
+              "| html | md |",
+              "| --- | --- |",
+              `| <img src="${raw}/html.png" width="400"> | <img src="${raw}/md.png" width="400"> |`,
+              video,
+              "",
+              "<details><summary>test:home output</summary>",
+              "",
+              "```",
+              log.slice(-6000),
+              "```",
+              "</details>",
+            ].join("\n")
+            const issue_number = context.issue.number
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number })
+            const mine = comments.find((c) => c.body?.includes(marker))
+            if (mine) await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body })
+            else await github.rest.issues.createComment({ owner, repo, issue_number, body })
