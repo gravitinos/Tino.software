@@ -24,7 +24,12 @@ Open [http://localhost:3000](http://localhost:3000).
 `lib/github.ts` pulls profile, repos, and recent public events for `gravitinos`.
 Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
 otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
-(no scopes needed) also lifts the 60 req/h unauthenticated rate limit.
+also lifts the 60 req/h unauthenticated rate limit.
+
+The "last commit" timer uses the newest push event. With a token belonging to
+`gravitinos` (classic token with `repo` scope), private pushes such as
+tino.build count too; only the timestamp is shown, never the repo name.
+Without a token it only sees public pushes.
 If GitHub is unreachable, the stats block is hidden.
 
 ## Markdown view

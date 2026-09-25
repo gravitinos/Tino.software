@@ -1,9 +1,16 @@
 import { PixelWord } from "@/components/pixel-word"
 import { Swappable } from "@/components/view-mode"
-import { getGitHubStats, GITHUB_URL, GITHUB_USER } from "@/lib/github"
+import {
+  BUILD_URL,
+  getGitHubStats,
+  GITHUB_URL,
+  GITHUB_USER,
+} from "@/lib/github"
 import { homeMarkdown, statItems } from "@/lib/markdown"
 import { GraphActivity } from "@/registry/default/graph-activity/graph-activity"
+import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
 import { GraphStat } from "@/registry/default/graph-stat/graph-stat"
+import { GraphTimer } from "@/registry/default/graph-timer/graph-timer"
 
 export const revalidate = 3600
 
@@ -27,6 +34,30 @@ export default async function Page() {
                 github.com/{GITHUB_USER}
               </a>
             </p>
+          </section>
+
+          <section className="grid grid-cols-1 gap-10 sm:grid-cols-2">
+            <Graph title="Experiments">
+              <GraphBody className="flex flex-col gap-2">
+                <a
+                  className="text-3xl tracking-tight text-graph-accent hover:underline hover:underline-offset-4 sm:text-4xl"
+                  href={BUILD_URL}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  tino.build
+                </a>
+                <p className="text-graph-muted">kitchen sink, things in progress</p>
+              </GraphBody>
+            </Graph>
+            {gh.lastPushAt ? (
+              <GraphTimer
+                title="Last commit"
+                kind="ago"
+                at={gh.lastPushAt}
+                caption="pushed to github"
+              />
+            ) : null}
           </section>
 
           {gh.ok ? (

@@ -1,7 +1,12 @@
 import { fence } from "@/registry/default/graph-knap/frame"
 import { asciiSpark, asciiStat } from "@/registry/default/graph-knap/graphs"
 
-import { GITHUB_URL, GITHUB_USER, type GitHubStats } from "@/lib/github"
+import {
+  BUILD_URL,
+  GITHUB_URL,
+  GITHUB_USER,
+  type GitHubStats,
+} from "@/lib/github"
 
 const compact = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -38,10 +43,16 @@ export function homeMarkdown(gh: GitHubStats) {
   const parts = [
     "# tino",
     `Software. [github.com/${GITHUB_USER}](${GITHUB_URL})`,
+    `Experiments: [tino.build](${BUILD_URL})`,
   ]
 
   if (gh.ok) {
-    parts.push("## GitHub", fence(asciiStat({ title: "GitHub", items: statItems(gh) })))
+    parts.push("## GitHub")
+    if (gh.lastPushAt) {
+      const at = new Date(gh.lastPushAt).toISOString().slice(0, 16)
+      parts.push(`Last commit: ${at.replace("T", " ")} UTC`)
+    }
+    parts.push(fence(asciiStat({ title: "GitHub", items: statItems(gh) })))
     if (gh.contributions.length > 0) {
       parts.push(
         fence(

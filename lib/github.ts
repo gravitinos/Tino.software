@@ -2,6 +2,7 @@ import "server-only"
 
 export const GITHUB_USER = "gravitinos"
 export const GITHUB_URL = `https://github.com/${GITHUB_USER}`
+export const BUILD_URL = "https://tino.build"
 
 const REVALIDATE = 60 * 60 // 1h
 
@@ -12,6 +13,8 @@ export type GitHubStats = {
   publicRepos: number
   createdAt: string | null
   stars: number
+  /** Most recent push, including private repos when GITHUB_TOKEN is the owner's. */
+  lastPushAt: string | null
   contributions: ContributionDay[]
   contributionsTotal: number
 }
@@ -88,12 +91,17 @@ async function getContributions(): Promise<ContributionDay[]> {
 }
 
 export async function getGitHubStats(): Promise<GitHubStats> {
-  const [user, repos, contributions] = await Promise.all([
+  const [user, repos, events, contributions] = await Promise.all([
     getJson<{ public_repos: number; created_at: string }>(
       `https://api.github.com/users/${GITHUB_USER}`
     ),
     getJson<{ fork: boolean; stargazers_count: number }[]>(
       `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`
+    ),
+    // Authenticated as the owner, /events includes private activity; only the
+    // timestamp is used, so private repo names never reach the page.
+    getJson<{ type: string; created_at: string }[]>(
+      `https://api.github.com/users/${GITHUB_USER}/events${process.env.GITHUB_TOKEN ? "" : "/public"}?per_page=100`
     ),
     getContributions(),
   ])
@@ -105,6 +113,7 @@ export async function getGitHubStats(): Promise<GitHubStats> {
     stars: (repos ?? [])
       .filter((r) => !r.fork)
       .reduce((sum, r) => sum + r.stargazers_count, 0),
+    lastPushAt: events?.find((e) => e.type === "PushEvent")?.created_at ?? null,
     contributions,
     contributionsTotal: contributions.reduce((sum, d) => sum + d.count, 0),
   }
