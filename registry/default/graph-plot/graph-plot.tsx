@@ -1,7 +1,3 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import {
   Graph,
   GraphBody,
@@ -10,8 +6,8 @@ import {
 } from "@/registry/default/graph-frame/graph-frame"
 import {
   clamp01,
+  enterDelay,
   fillDelay,
-  graphTransition,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -54,7 +50,6 @@ function GraphPlot({
   className,
 }: GraphPlotProps) {
   const data = numbers(dataProp)
-  const reduce = useReducedMotion()
   const max = Math.max(...data, 0)
   const min = Math.min(0, ...data)
   const range = max - min || 1
@@ -105,23 +100,22 @@ function GraphPlot({
                         ? toneClass(palette, "secondary")
                         : "text-transparent"
 
+                    const enters = shown && glyph !== " "
+
                     return (
-                      <motion.span
-                        className={cn("h-[1em] w-full text-center", tone)}
-                        initial={
-                          reduce || !shown || glyph === " "
-                            ? false
-                            : { opacity: 0 }
-                        }
+                      <span
+                        className={cn(
+                          "h-[1em] w-full text-center",
+                          enters && "graph-fade",
+                          tone
+                        )}
                         key={row}
-                        transition={graphTransition(reduce, {
-                          delay: fillDelay(reduce, column),
-                        })}
-                        viewport={{ once: true }}
-                        whileInView={{ opacity: 1 }}
+                        style={
+                          enters ? enterDelay(fillDelay(column)) : undefined
+                        }
                       >
                         {glyph}
-                      </motion.span>
+                      </span>
                     )
                   })}
                 </span>

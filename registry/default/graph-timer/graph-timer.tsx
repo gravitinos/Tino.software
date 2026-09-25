@@ -1,7 +1,5 @@
 "use client"
 
-import { motion, useReducedMotion } from "motion/react"
-
 import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
 import {
   formatAgo,
@@ -11,7 +9,6 @@ import {
   useGraphNow,
 } from "@/registry/default/graph-frame/graph-clock"
 import {
-  fadeUp,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -38,8 +35,6 @@ function GraphTimer({
   corner,
   className,
 }: GraphTimerProps) {
-  const reduce = useReducedMotion()
-  const enter = fadeUp(reduce)
   const now = useGraphNow()
   const origin = at == null ? Number.NaN : parseInstant(at)
   let value = kind === "ago" ? "0s ago" : "00:00:00"
@@ -64,13 +59,7 @@ function GraphTimer({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.div
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          variants={enter}
-          viewport={{ once: true, amount: 0.5 }}
-          whileInView="show"
-        >
+        <div className="graph-enter flex flex-col gap-2">
           <p
             className={cn(
               "text-3xl tracking-tight tabular-nums sm:text-4xl",
@@ -80,7 +69,7 @@ function GraphTimer({
             {value}
           </p>
           {caption ? <p className="text-graph-muted">{caption}</p> : null}
-        </motion.div>
+        </div>
         <span className="sr-only">{spoken}</span>
       </GraphBody>
     </Graph>

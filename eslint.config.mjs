@@ -12,8 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Vendored mdxcn source (shadcn registry copy); keep in sync with upstream.
-    "registry/**",
+    // mdxcn source, forked from the shadcn registry copy (server components).
+    "registry/default/**",
   ]),
 ]);
 

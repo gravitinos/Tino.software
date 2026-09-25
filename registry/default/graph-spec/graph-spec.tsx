@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -14,10 +11,7 @@ import {
   splitLabel,
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
-import {
-  fadeUp,
-  staggerList,
-} from "@/registry/default/graph-frame/graph-motion"
+import { staggerDelay } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 type SpecRow = {
@@ -46,9 +40,6 @@ function GraphSpec({
   corner,
   className,
 }: GraphSpecProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const listed = listItems(children).map((item) => {
     const { label, rest } = splitLabel(itemText(item))
     const content = (item.props as { children?: ReactNode }).children
@@ -69,18 +60,12 @@ function GraphSpec({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.dl
-          className="flex flex-col gap-3"
-          initial={reduce ? false : "hidden"}
-          variants={list}
-          viewport={{ once: true, amount: 0.5 }}
-          whileInView="show"
-        >
-          {rows.map((row) => (
-            <motion.div
-              className="grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)] items-baseline gap-x-3 sm:gap-x-6"
+        <dl className="flex flex-col gap-3">
+          {rows.map((row, index) => (
+            <div
+              className="graph-enter grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)] items-baseline gap-x-3 sm:gap-x-6"
               key={row.label}
-              variants={item}
+              style={staggerDelay(index, 0.04)}
             >
               <dt className="text-graph-muted">{row.label}</dt>
               <dd
@@ -91,9 +76,9 @@ function GraphSpec({
               >
                 {row.value}
               </dd>
-            </motion.div>
+            </div>
           ))}
-        </motion.dl>
+        </dl>
       </GraphBody>
     </Graph>
   )

@@ -192,3 +192,57 @@
     color: var(--background);
   }
 }
+
+/*
+ * Graph enter animations. Server-rendered markup carries the classes;
+ * GraphReveal sets data-inview on the figure to start them. Elements animate
+ * to their own resting opacity, so a dimmed cell fades in to its dim level.
+ */
+@keyframes graph-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes graph-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@layer components {
+  .graph-enter,
+  .graph-fade {
+    animation: graph-enter 220ms cubic-bezier(0.215, 0.61, 0.355, 1)
+      var(--graph-delay, 0ms) both paused;
+  }
+
+  .graph-fade {
+    animation-name: graph-fade;
+  }
+
+  [data-inview] :is(.graph-enter, .graph-fade) {
+    animation-play-state: running;
+  }
+
+  @media (prefers-reduced-motion: reduce), (scripting: none) {
+    .graph-enter,
+    .graph-fade {
+      animation: none;
+    }
+  }
+}
+
+/* Panels that swap in place (tabs). Replays each time the panel is shown. */
+@layer components {
+  .graph-panel {
+    animation: graph-fade 160ms cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .graph-panel {
+      animation: none;
+    }
+  }
+}

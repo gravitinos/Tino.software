@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -18,10 +15,7 @@ import {
   tableOf,
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
-import {
-  fadeUp,
-  staggerList,
-} from "@/registry/default/graph-frame/graph-motion"
+import { staggerDelay } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 type InvoiceParty = {
@@ -224,9 +218,6 @@ function GraphInvoice({
         textOf((paragraph.props as { children?: ReactNode }).children).trim()
       )
       .find((text) => text && !moneyLine(text))
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const showQty = items.some((row) => row.qty != null)
   const showRate = items.some((row) => row.rate != null)
   const columns = 1 + Number(showQty) + Number(showRate) + 1
@@ -281,14 +272,13 @@ function GraphInvoice({
                 </th>
               </tr>
             </thead>
-            <motion.tbody
-              initial={reduce ? false : "hidden"}
-              variants={list}
-              viewport={{ once: true, amount: 0.4 }}
-              whileInView="show"
-            >
-              {items.map((row) => (
-                <motion.tr key={row.description} variants={item}>
+            <tbody>
+              {items.map((row, index) => (
+                <tr
+                  className="graph-enter"
+                  key={row.description}
+                  style={staggerDelay(index, 0.04)}
+                >
                   <td className="px-0 py-2.5 text-left">{row.description}</td>
                   {showQty ? (
                     <td className="px-3 py-2.5 text-right tabular-nums">
@@ -303,27 +293,21 @@ function GraphInvoice({
                   <td className="px-0 py-2.5 text-right tabular-nums">
                     {row.amount}
                   </td>
-                </motion.tr>
+                </tr>
               ))}
-            </motion.tbody>
+            </tbody>
           </table>
         </div>
 
         {totals && totals.length > 0 ? (
           <div className="flex flex-col gap-3">
             <GraphRule />
-            <motion.dl
-              className="ml-auto flex w-full max-w-[22rem] flex-col gap-2"
-              initial={reduce ? false : "hidden"}
-              variants={list}
-              viewport={{ once: true }}
-              whileInView="show"
-            >
-              {totals.map((entry) => (
-                <motion.div
-                  className="grid grid-cols-[minmax(0,1fr)_8rem] items-baseline gap-x-4"
+            <dl className="ml-auto flex w-full max-w-[22rem] flex-col gap-2">
+              {totals.map((entry, index) => (
+                <div
+                  className="graph-enter grid grid-cols-[minmax(0,1fr)_8rem] items-baseline gap-x-4"
                   key={entry.label}
-                  variants={item}
+                  style={staggerDelay(index, 0.04, items.length * 0.04)}
                 >
                   <dt
                     className={cn(
@@ -340,9 +324,9 @@ function GraphInvoice({
                   >
                     {entry.value}
                   </dd>
-                </motion.div>
+                </div>
               ))}
-            </motion.dl>
+            </dl>
           </div>
         ) : null}
 

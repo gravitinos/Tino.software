@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -17,8 +14,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -87,9 +83,6 @@ function GraphBullet({
   corner,
   className,
 }: GraphBulletProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const listed = listItems(children).map((item) => {
     const { label, rest } = splitLabel(itemText(item))
     const [value, restMax] = rest.split(/\s*\/\s*/)
@@ -124,15 +117,8 @@ function GraphBullet({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-3">
-        <motion.ul
-          className="flex w-full flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {items.map((entry) => {
+        <ul className="flex w-full flex-col gap-2" role="list">
+          {items.map((entry, rowIndex) => {
             const peak =
               entry.max ?? Math.max(entry.value, entry.target ?? 0, 1)
             const filled = Math.min(
@@ -151,11 +137,11 @@ function GraphBullet({
                   )
 
             return (
-              <motion.li
+              <li
                 aria-label={`${entry.label} ${formatItem(entry)}`}
-                className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,7rem)] items-center gap-x-2 sm:gap-x-4"
+                className="graph-enter grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,7rem)] items-center gap-x-2 sm:gap-x-4"
                 key={entry.label}
-                variants={item}
+                style={staggerDelay(rowIndex, 0.05)}
               >
                 <span className="truncate text-foreground">{entry.label}</span>
                 <span className="flex min-w-0 items-center">
@@ -192,10 +178,10 @@ function GraphBullet({
                 <span className="text-right text-graph-muted tabular-nums">
                   {formatItem(entry)}
                 </span>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ul>
+        </ul>
       </GraphBody>
     </Graph>
   )

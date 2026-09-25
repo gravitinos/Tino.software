@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,8 +12,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -62,9 +58,6 @@ function GraphSlope({
   corner,
   className,
 }: GraphSlopeProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const listed = listItems(children).map((item) => {
     const { label, rest } = splitLabel(itemText(item))
     const [from, to] = rest.split(/\s*(?:→|->|—>|=>)\s*/)
@@ -91,24 +84,17 @@ function GraphSlope({
           <span />
           <span className="text-right text-graph-muted">{toLabel}</span>
         </div>
-        <motion.ul
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {items.map((row) => {
+        <ul className="flex flex-col gap-2" role="list">
+          {items.map((row, index) => {
             const up = row.to > row.from
             const down = row.to < row.from
 
             return (
-              <motion.li
+              <li
                 aria-label={`${row.label} from ${format(row.from)} to ${format(row.to)}`}
-                className="grid grid-cols-[minmax(0,1fr)_6.5rem_2rem_6.5rem] items-baseline gap-x-3"
+                className="graph-enter grid grid-cols-[minmax(0,1fr)_6.5rem_2rem_6.5rem] items-baseline gap-x-3"
                 key={row.label}
-                variants={item}
+                style={staggerDelay(index, 0.05)}
               >
                 <span className="truncate text-foreground">{row.label}</span>
                 <span className="text-right text-graph-muted tabular-nums">
@@ -135,10 +121,10 @@ function GraphSlope({
                 >
                   {format(row.to)}
                 </span>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ul>
+        </ul>
       </GraphBody>
     </Graph>
   )

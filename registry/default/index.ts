@@ -36,12 +36,13 @@ export { Step, Steps } from "./steps/steps"
 export { Terminal } from "./terminal/terminal"
 export { Change, Changelog } from "./changelog/changelog"
 export { GraphArrow } from "./graph-frame/graph-arrow"
+export { GraphReveal } from "./graph-frame/graph-reveal"
 export {
-  fadeUp,
-  graphTransition,
-  staggerList,
-  easeOutCubic,
   clamp01,
+  DIM_OPACITY,
+  enterDelay,
+  fillDelay,
+  staggerDelay,
   GLYPH_SETS,
   INTENSITY_GLYPHS,
   intensityClass,

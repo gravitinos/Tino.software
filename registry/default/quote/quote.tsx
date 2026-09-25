@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   Graph,
@@ -9,7 +6,6 @@ import {
   GraphProse,
   GraphRule,
 } from "@/registry/default/graph-frame/graph-frame"
-import { fadeUp } from "@/registry/default/graph-frame/graph-motion"
 
 type QuoteProps = {
   /** Who said it. Drawn after an em dash. */
@@ -34,19 +30,12 @@ type QuoteProps = {
  * ```
  */
 function Quote({ by, source, title, children, corner, className }: QuoteProps) {
-  const reduce = useReducedMotion()
   const cite = by || source
 
   return (
     <Graph className={className} corner={corner} title={title}>
       <GraphBody>
-        <motion.blockquote
-          className="m-0 flex flex-col gap-5 p-0"
-          initial={reduce ? false : "hidden"}
-          variants={fadeUp(reduce)}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <blockquote className="graph-enter m-0 flex flex-col gap-5 p-0">
           <div className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-x-3">
             <span
               aria-hidden="true"
@@ -76,7 +65,7 @@ function Quote({ by, source, title, children, corner, className }: QuoteProps) {
               </footer>
             </>
           ) : null}
-        </motion.blockquote>
+        </blockquote>
       </GraphBody>
     </Graph>
   )

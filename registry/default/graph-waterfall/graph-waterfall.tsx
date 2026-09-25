@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -18,8 +15,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -107,9 +103,6 @@ function GraphWaterfall({
   corner,
   className,
 }: GraphWaterfallProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const marks = trackMarks(glyphs)
   const listed = listItems(children).map((item) => {
     const { label, rest } = splitLabel(itemText(item))
@@ -178,14 +171,7 @@ function GraphWaterfall({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-3">
-        <motion.ul
-          className="flex w-full flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <ul className="flex w-full flex-col gap-2" role="list">
           {segments.map((segment, index) => {
             const start = Math.min(column(segment.from), column(segment.to))
             const end = Math.max(
@@ -199,9 +185,9 @@ function GraphWaterfall({
             return (
               <li className="flex flex-col gap-2" key={segment.label}>
                 {showRule ? <GraphRule /> : null}
-                <motion.div
-                  className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,5.5rem)] items-center gap-x-2 sm:gap-x-4"
-                  variants={item}
+                <div
+                  className="graph-enter grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,5.5rem)] items-center gap-x-2 sm:gap-x-4"
+                  style={staggerDelay(index, 0.05)}
                 >
                   <span className="truncate text-foreground">
                     {segment.label}
@@ -235,11 +221,11 @@ function GraphWaterfall({
                   >
                     {formatValue(segment, segment.kind)}
                   </span>
-                </motion.div>
+                </div>
               </li>
             )
           })}
-        </motion.ul>
+        </ul>
         <span className="sr-only">
           {segments
             .map(

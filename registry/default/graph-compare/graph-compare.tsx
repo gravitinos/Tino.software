@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,10 +12,9 @@ import {
 } from "@/registry/default/graph-frame/graph-frame"
 import {
   DIM_OPACITY,
-  fadeUp,
   isMonoPalette,
   seriesClass,
-  staggerList,
+  staggerDelay,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
@@ -119,9 +115,6 @@ function GraphCompare({
           values: row.values.map((value) => compareCell(value)),
         })) ?? []))
   ).map((row) => ({ ...row, label: row.label ?? "" }))
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const template = `minmax(7rem,1fr) repeat(${columns.length}, minmax(4.5rem, 7rem))`
 
   return (
@@ -154,20 +147,15 @@ function GraphCompare({
               )
             })}
           </div>
-          <motion.ul
-            className="flex flex-col gap-2"
-            initial={reduce ? false : "hidden"}
-            role="list"
-            variants={list}
-            viewport={{ once: true, amount: 0.4 }}
-            whileInView="show"
-          >
-            {rows.map((row) => (
-              <motion.li
-                className="grid items-baseline gap-x-4"
+          <ul className="flex flex-col gap-2" role="list">
+            {rows.map((row, rowIndex) => (
+              <li
+                className="graph-enter grid items-baseline gap-x-4"
                 key={row.label}
-                style={{ gridTemplateColumns: template }}
-                variants={item}
+                style={{
+                  gridTemplateColumns: template,
+                  ...staggerDelay(rowIndex, 0.04),
+                }}
               >
                 <span className="truncate text-foreground">{row.label}</span>
                 {columns.map((column, index) => {
@@ -203,9 +191,9 @@ function GraphCompare({
                     </span>
                   )
                 })}
-              </motion.li>
+              </li>
             ))}
-          </motion.ul>
+          </ul>
         </div>
       </GraphBody>
     </Graph>

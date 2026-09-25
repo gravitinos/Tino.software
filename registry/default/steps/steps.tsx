@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -16,10 +13,7 @@ import {
   splitDash,
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
-import {
-  fadeUp,
-  staggerList,
-} from "@/registry/default/graph-frame/graph-motion"
+import { staggerDelay } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 type StepState = "done" | "now" | "next"
@@ -95,23 +89,13 @@ function stepsOf(children: ReactNode): StepProps[] {
   })
 }
 function Steps({ title, children, corner, className }: StepsProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.06)
   const steps = stepsOf(children)
   const digits = String(steps.length).length
 
   return (
     <Graph className={className} corner={corner} title={title}>
       <GraphBody>
-        <motion.ol
-          className="flex flex-col"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.3 }}
-          whileInView="show"
-        >
+        <ol className="flex flex-col" role="list">
           {steps.map((step, index) => {
             const state = step.state ?? "done"
             const last = index === steps.length - 1
@@ -120,10 +104,10 @@ function Steps({ title, children, corner, className }: StepsProps) {
             const number = String(index + 1).padStart(Math.max(2, digits), "0")
 
             return (
-              <motion.li
-                className="flex flex-col"
+              <li
+                className="graph-enter flex flex-col"
                 key={`${index}-${step.title ?? ""}`}
-                variants={item}
+                style={staggerDelay(index, 0.06)}
               >
                 <div className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-baseline gap-x-3">
                   <span
@@ -169,10 +153,10 @@ function Steps({ title, children, corner, className }: StepsProps) {
                     <span className="text-center text-graph-frame">│</span>
                   </div>
                 )}
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ol>
+        </ol>
       </GraphBody>
     </Graph>
   )

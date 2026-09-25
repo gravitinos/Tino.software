@@ -1,15 +1,10 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
   intensityClass,
   intensityGlyph,
   intensityLevel,
   resolveGlyphs,
-  staggerList,
+  staggerDelay,
   type Glyphs,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -172,9 +167,6 @@ function GraphActivity({
   corner,
   className,
 }: GraphActivityProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.01)
   const weeks = buildWeeks(days, weekStartsOn)
   const months = monthLabels(weeks)
   const labels = dayLabels(weekStartsOn)
@@ -218,21 +210,12 @@ function GraphActivity({
                   </span>
                 ))}
               </div>
-              <motion.div
-                className="flex flex-1"
-                initial={reduce ? false : "hidden"}
-                variants={list}
-                viewport={{ once: true, amount: 0.2 }}
-                whileInView="show"
-              >
+              <div className="flex flex-1">
                 {weeks.map((week, weekIndex) => (
-                  <motion.div
-                    className={cn(
-                      "flex min-w-[1ch] flex-1 flex-col",
-                      !reduce && "will-change-[transform,opacity]"
-                    )}
+                  <div
+                    className="graph-enter flex min-w-[1ch] flex-1 flex-col"
                     key={week[0]?.date ?? weekIndex}
-                    variants={item}
+                    style={staggerDelay(weekIndex, 0.01)}
                   >
                     {week.map((cell) => {
                       const level = cell.inRange
@@ -254,9 +237,9 @@ function GraphActivity({
                         </span>
                       )
                     })}
-                  </motion.div>
+                  </div>
                 ))}
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>

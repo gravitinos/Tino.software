@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -17,12 +14,11 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
   isMonoPalette,
   resolveGlyphs,
   seriesClass,
   seriesDim,
-  staggerList,
+  staggerDelay,
   type Glyphs,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -128,9 +124,6 @@ function GraphStack({
   corner,
   className,
 }: GraphStackProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const set = glyphs == null ? DEFAULT_GLYPHS : resolveGlyphs(glyphs)
   const listed = listItems(children).map((item) => {
     const { label, rest } = splitLabel(itemText(item))
@@ -164,25 +157,18 @@ function GraphStack({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-6">
-        <motion.ul
-          className="flex flex-col gap-3"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {rows.map((row) => {
+        <ul className="flex flex-col gap-3" role="list">
+          {rows.map((row, rowIndex) => {
             const painted = paintRow(row.segments, ticks, set, accent)
 
             return (
-              <motion.li
+              <li
                 aria-label={`${row.label}: ${row.segments
                   .map((segment) => `${segment.label} ${segment.value}`)
                   .join(", ")}`}
-                className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-center gap-x-2 sm:gap-x-4"
+                className="graph-enter grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-center gap-x-2 sm:gap-x-4"
                 key={row.label}
-                variants={item}
+                style={staggerDelay(rowIndex, 0.05)}
               >
                 <span className="truncate text-foreground">{row.label}</span>
                 <GraphTrack>
@@ -204,10 +190,10 @@ function GraphStack({
                     ))
                   )}
                 </GraphTrack>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ul>
+        </ul>
         <ul className="flex flex-wrap gap-x-4 gap-y-1" role="list">
           {legend.map((label, index) => {
             const glyph = set[index % set.length] ?? "█"

@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -17,11 +14,10 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
   isMonoPalette,
   seriesClass,
   seriesDim,
-  staggerList,
+  staggerDelay,
   trackMarks,
   type Glyphs,
   type GraphPalette,
@@ -63,9 +59,6 @@ function GraphFunnel({
   corner,
   className,
 }: GraphFunnelProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const listed = listItems(children).map((item) => {
     const { token, rest } = firstToken(itemText(item))
     return {
@@ -92,14 +85,7 @@ function GraphFunnel({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.ol
-          className="flex flex-col gap-3"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <ol className="flex flex-col gap-3" role="list">
           {steps.map((step, index) => {
             const width = Math.max(1, Math.round((step.value / max) * ticks))
             const percent = Math.round((step.value / head) * 100)
@@ -107,11 +93,13 @@ function GraphFunnel({
             const dim = Boolean(stage) && !focused
 
             return (
-              <motion.li
-                className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,8ch)_minmax(0,4ch)] items-center gap-x-2 sm:gap-x-4"
+              <li
+                className="graph-enter grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,8ch)_minmax(0,4ch)] items-center gap-x-2 sm:gap-x-4"
                 key={step.label}
-                style={seriesDim(palette, !dim)}
-                variants={item}
+                style={{
+                  ...seriesDim(palette, !dim),
+                  ...staggerDelay(index, 0.05),
+                }}
               >
                 <span className="truncate text-foreground">{step.label}</span>
                 <GraphTrack>
@@ -140,10 +128,10 @@ function GraphFunnel({
                 <span className="text-right text-graph-muted tabular-nums">
                   {index === 0 ? "" : `${percent}%`}
                 </span>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ol>
+        </ol>
       </GraphBody>
     </Graph>
   )

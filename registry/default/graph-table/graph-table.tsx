@@ -1,8 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   alignsOf,
@@ -18,10 +14,7 @@ import {
   tableOf,
   words,
 } from "@/registry/default/graph-frame/graph-frame"
-import {
-  fadeUp,
-  staggerList,
-} from "@/registry/default/graph-frame/graph-motion"
+import { staggerDelay } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 type GraphAlign = "left" | "right"
@@ -81,9 +74,6 @@ function GraphTable({
       : alignProp) ??
     alignsOf(head?.children) ??
     markdown?.align
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
 
   return (
     <Graph title={title} className={className} corner={corner}>
@@ -114,14 +104,13 @@ function GraphTable({
                 </th>
               </tr>
             </thead>
-            <motion.tbody
-              initial={reduce ? false : "hidden"}
-              variants={list}
-              viewport={{ once: true, amount: 0.4 }}
-              whileInView="show"
-            >
+            <tbody>
               {rows?.map((row, rowIndex) => (
-                <motion.tr key={rowIndex} variants={item}>
+                <tr
+                  className="graph-enter"
+                  key={rowIndex}
+                  style={staggerDelay(rowIndex, 0.04)}
+                >
                   {row.map((cell, cellIndex) => (
                     <td
                       key={cellIndex}
@@ -137,9 +126,9 @@ function GraphTable({
                       {cell}
                     </td>
                   ))}
-                </motion.tr>
+                </tr>
               ))}
-            </motion.tbody>
+            </tbody>
             {footer ? (
               <tfoot>
                 <tr>

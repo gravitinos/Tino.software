@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -19,9 +16,8 @@ import {
 } from "@/registry/default/graph-frame/graph-frame"
 import {
   clamp01,
-  fadeUp,
   seriesDim,
-  staggerList,
+  staggerDelay,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -77,9 +73,6 @@ function GraphGantt({
   corner,
   className,
 }: GraphGanttProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const listed = listItems(children).map((item) => {
     const text = itemText(item)
     const { label, rest } = splitLabel(text)
@@ -138,15 +131,8 @@ function GraphGantt({
             </GraphTrack>
           </div>
         ) : null}
-        <motion.ul
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {items.map((entry) => {
+        <ul className="flex flex-col gap-2" role="list">
+          {items.map((entry, rowIndex) => {
             const start = Math.round(clamp01(entry.start) * columns)
             const end = Math.max(
               start + 1,
@@ -160,16 +146,18 @@ function GraphGantt({
             const dim = Boolean(stage) && !focused
 
             return (
-              <motion.li
+              <li
                 aria-label={`${entry.label} from ${Math.round(entry.start * 100)}% to ${Math.round(entry.end * 100)}%${
                   entry.complete != null
                     ? `, ${Math.round(entry.complete * 100)}% complete`
                     : ""
                 }`}
-                className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-center gap-x-2 sm:gap-x-4"
+                className="graph-enter grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-center gap-x-2 sm:gap-x-4"
                 key={entry.label}
-                style={seriesDim(palette, !dim)}
-                variants={item}
+                style={{
+                  ...seriesDim(palette, !dim),
+                  ...staggerDelay(rowIndex, 0.05),
+                }}
               >
                 <span
                   className={cn(
@@ -203,10 +191,10 @@ function GraphGantt({
                     )
                   })}
                 </GraphTrack>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ul>
+        </ul>
         {ticks && ticks.length > 0 ? (
           <div className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-x-2 sm:gap-x-4">
             <span />

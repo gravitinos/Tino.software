@@ -1,7 +1,4 @@
-"use client"
-
-import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import type { CSSProperties, ReactNode } from "react"
 
 import {
   childItems,
@@ -16,8 +13,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -83,11 +79,11 @@ const signGlyph: Record<DiffSign, string> = {
 
 function DiffLine({
   row,
-  variants,
+  style,
   palette,
 }: {
   row: DiffRow
-  variants: ReturnType<typeof fadeUp>
+  style?: CSSProperties
   palette?: GraphPalette
 }) {
   const sign = row.sign ?? "keep"
@@ -102,16 +98,16 @@ function DiffLine({
   const mark = sign === "keep" ? toneClass(palette, "empty") : tone
 
   return (
-    <motion.div
-      className="grid grid-cols-[1.25rem_minmax(0,1fr)_8ch] items-baseline gap-x-3"
-      variants={variants}
+    <div
+      className="graph-enter grid grid-cols-[1.25rem_minmax(0,1fr)_8ch] items-baseline gap-x-3"
+      style={style}
     >
       <span aria-hidden="true" className={cn("text-center select-none", mark)}>
         {signGlyph[sign]}
       </span>
       <span className={tone}>{row.label}</span>
       <span className={cn("text-right tabular-nums", tone)}>{row.value}</span>
-    </motion.div>
+    </div>
   )
 }
 
@@ -124,9 +120,6 @@ function GraphDiff({
   corner,
   className,
 }: GraphDiffProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const listed = diffFromList(children)
   const tagged = childItems(children, Line).map((entry) => ({
     ...entry,
@@ -144,31 +137,27 @@ function GraphDiff({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-3">
-        <motion.ul
-          role="list"
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {rows.map((row) => (
+        <ul role="list" className="flex flex-col gap-2">
+          {rows.map((row, index) => (
             <li key={row.label}>
-              <DiffLine palette={palette} row={row} variants={item} />
+              <DiffLine
+                palette={palette}
+                row={row}
+                style={staggerDelay(index, 0.04)}
+              />
             </li>
           ))}
-        </motion.ul>
+        </ul>
         {footer ? (
           <>
             <GraphRule />
-            <motion.div
-              initial={reduce ? false : "hidden"}
-              variants={list}
-              viewport={{ once: true }}
-              whileInView="show"
-            >
-              <DiffLine palette={palette} row={footer} variants={item} />
-            </motion.div>
+            <div>
+              <DiffLine
+                palette={palette}
+                row={footer}
+                style={staggerDelay(rows.length, 0.04)}
+              />
+            </div>
           </>
         ) : null}
       </GraphBody>
