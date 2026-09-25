@@ -66,7 +66,10 @@ export function homeMarkdown(gh: GitHubStats) {
     }
   }
 
-  parts.push("---", `tino.software · [github](${GITHUB_URL})`)
+  parts.push(
+    "---",
+    `tino.software · [site info](/site) · [github](${GITHUB_URL})`
+  )
 
   return parts.join("\n\n") + "\n"
 }
