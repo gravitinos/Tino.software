@@ -179,7 +179,13 @@ function GraphActivity({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-4">
-        <div className="scrollbar-graph overflow-x-auto">
+        {/* Focusable so keyboard users can scroll the grid on narrow screens. */}
+        <div
+          aria-label={`${title}, ${summary}`}
+          className="scrollbar-graph overflow-x-auto outline-none focus-visible:outline-1 focus-visible:outline-graph-accent focus-visible:outline-dashed"
+          role="region"
+          tabIndex={0}
+        >
           <div
             className="flex w-full flex-col gap-1 pr-[2ch]"
             style={{ minWidth: `max(100%, ${weeks.length + 4}ch)` }}

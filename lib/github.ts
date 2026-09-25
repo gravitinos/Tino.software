@@ -5,6 +5,8 @@ export const GITHUB_URL = `https://github.com/${GITHUB_USER}`
 export const BUILD_URL = "https://tino.build"
 
 const REVALIDATE = 60 * 60 // 1h
+/** The last-commit timer refetches more often; everything else stays hourly. */
+const PUSH_REVALIDATE = 5 * 60 // 5m
 
 type ContributionDay = { date: string; count: number }
 
@@ -30,11 +32,15 @@ function headers(): HeadersInit {
   return h
 }
 
-async function getJson<T>(url: string, init?: RequestInit): Promise<T | null> {
+async function getJson<T>(
+  url: string,
+  init?: RequestInit,
+  revalidate = REVALIDATE
+): Promise<T | null> {
   try {
     const res = await fetch(url, {
       headers: headers(),
-      next: { revalidate: REVALIDATE },
+      next: { revalidate },
       ...init,
     })
     if (!res.ok) return null
@@ -90,19 +96,57 @@ async function getContributions(): Promise<ContributionDay[]> {
   return data?.contributions.map(({ date, count }) => ({ date, count })) ?? []
 }
 
+type PushedRepo = { pushed_at: string | null; owner: { login: string } }
+
+function newest(...dates: (string | null | undefined)[]): string | null {
+  let best: string | null = null
+  for (const d of dates) {
+    if (d && (best == null || Date.parse(d) > Date.parse(best))) best = d
+  }
+  return best
+}
+
+/**
+ * Newest push. The events API can lag by hours, so it's paired with the repo
+ * list sorted by `pushed_at`, which updates as soon as a push lands. Both are
+ * one small request on a short cache; the newest timestamp wins.
+ */
+async function getLastPushAt(): Promise<string | null> {
+  const token = Boolean(process.env.GITHUB_TOKEN)
+  const [repos, events] = await Promise.all([
+    // With the owner's token, /user/repos includes private repos.
+    getJson<PushedRepo[]>(
+      token
+        ? "https://api.github.com/user/repos?affiliation=owner&sort=pushed&per_page=1"
+        : `https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&per_page=1`,
+      undefined,
+      PUSH_REVALIDATE
+    ),
+    // Catches pushes to repos the user doesn't own. Authenticated as the owner,
+    // /events includes private activity; only the timestamp is used, so
+    // private repo names never reach the page.
+    getJson<{ type: string; created_at: string }[]>(
+      `https://api.github.com/users/${GITHUB_USER}/events${token ? "" : "/public"}?per_page=30`,
+      undefined,
+      PUSH_REVALIDATE
+    ),
+  ])
+  const repo = repos?.[0]
+  return newest(
+    repo?.owner.login.toLowerCase() === GITHUB_USER ? repo.pushed_at : null,
+    events?.find((e) => e.type === "PushEvent")?.created_at
+  )
+}
+
 export async function getGitHubStats(): Promise<GitHubStats> {
-  const [user, repos, events, contributions] = await Promise.all([
+  const [user, repos, lastPushAt, contributions] = await Promise.all([
     getJson<{ public_repos: number; created_at: string }>(
       `https://api.github.com/users/${GITHUB_USER}`
     ),
     getJson<{ fork: boolean; stargazers_count: number }[]>(
       `https://api.github.com/users/${GITHUB_USER}/repos?per_page=100`
     ),
-    // Authenticated as the owner, /events includes private activity; only the
-    // timestamp is used, so private repo names never reach the page.
-    getJson<{ type: string; created_at: string }[]>(
-      `https://api.github.com/users/${GITHUB_USER}/events${process.env.GITHUB_TOKEN ? "" : "/public"}?per_page=100`
-    ),
+    getLastPushAt(),
     getContributions(),
   ])
 
@@ -113,7 +157,7 @@ export async function getGitHubStats(): Promise<GitHubStats> {
     stars: (repos ?? [])
       .filter((r) => !r.fork)
       .reduce((sum, r) => sum + r.stargazers_count, 0),
-    lastPushAt: events?.find((e) => e.type === "PushEvent")?.created_at ?? null,
+    lastPushAt,
     contributions,
     contributionsTotal: contributions.reduce((sum, d) => sum + d.count, 0),
   }
