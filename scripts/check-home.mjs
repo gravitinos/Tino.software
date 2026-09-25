@@ -5,7 +5,7 @@
 //   BASE_URL=https://tino.software bun run test:home
 //
 // Screenshots of each view land in artifacts/home/ for sharing. With RECORD=1
-// it also records home.mp4: scroll the page, flip to markdown (`m`) and back.
+// it also records home.mp4 at 60 fps: scroll the page, flip to markdown (`m`) and back.
 
 import { execFileSync, spawn } from "node:child_process"
 import { mkdirSync } from "node:fs"
@@ -88,7 +88,7 @@ try {
 
   if (process.env.RECORD) {
     ab("open", base + "/")
-    ab("record", "start", `${OUT}/home.mp4`)
+    ab("record", "start", `${OUT}/home.mp4`, "--fps", "60")
     for (const step of [
       ["wait", "1000"],
       ["scroll", "down", "800"],

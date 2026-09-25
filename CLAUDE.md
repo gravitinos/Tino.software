@@ -12,7 +12,7 @@ The homepage keeps **zero axe-core violations** (html and `?view=md`) and **"goo
 
 Use the `agent-browser` skill (`bunx agent-browser …`; load `bunx agent-browser skills get core` first) to look at UI work in a real browser instead of guessing.
 
-- While working: after a visible change, take a screenshot (`bunx agent-browser screenshot artifacts/<name>.png`) and share it with the user in the chat. For motion, interaction, or view switches, record a short video (`record start artifacts/<name>.mp4` … `record stop`) and share that too.
+- While working: after a visible change, take a screenshot (`bunx agent-browser screenshot artifacts/<name>.png`) and share it with the user in the chat. For motion, interaction, or view switches, record a short video at 60 fps (`record start artifacts/<name>.mp4 --fps 60` … `record stop`) and share that too.
 - In PRs: CI posts html/md screenshots and a walkthrough video as a sticky comment. Also put before/after screenshots of what changed in the PR description. For inline images, commit them to the `pr-media` branch under `pr-<number>/` and link `https://raw.githubusercontent.com/gravitinos/Tino.software/pr-media/pr-<number>/<file>`. Never commit media to the feature branch.
 - `artifacts/` is gitignored.
 - In Claude Code on the web, the SessionStart hook (`.claude/hooks/session-start.sh`) runs `bun install`, sets `AGENT_BROWSER_EXECUTABLE_PATH=/opt/pw-browsers/chromium` (Chrome for Testing can't be downloaded there), and installs `ffmpeg` for `record`.
