@@ -1,24 +1,14 @@
-# Geist Pixel — Coming Soon
+# tino.software
 
-Bun-powered landing page inspired by [Introducing Geist Pixel](https://vercel.com/blog/introducing-geist-pixel), with a **Vote for frontend** poll. Built with [Vite](https://vite.dev/) + [Nitro](https://nitro.build/) for deployment on [Vercel](https://vercel.com/).
+Personal site. Next.js (App Router) + shadcn, with figures drawn by
+[mdxcn](https://mdxcn.dev) and type set in [Geist Pixel](https://vercel.com/font).
 
 ## Stack
 
-- **Runtime:** [Bun](https://bun.sh/)
-- **Frontend:** Vite (HTML + TypeScript)
-- **Server:** Nitro API routes + SSR outlet
-- **Hosting:** Vercel (Bun functions via `vercel.json` + Nitro Vercel preset)
-- **Typography:** [Geist Pixel](https://vercel.com/font) (local `geist` package)
-
-## Effect v3 (local reference)
-
-Clone [Effect-TS/effect](https://github.com/Effect-TS/effect) at the latest v3 release tag for local browsing:
-
-```bash
-bun run clone:effect
-```
-
-Source lands in `reference/effect-v3/` (gitignored). Override the tag with `EFFECT_V3_TAG=effect@3.21.0 bun run clone:effect`.
+- **Framework:** Next.js 16, Tailwind v4, shadcn (`components.json`)
+- **Figures:** mdxcn, vendored under `registry/default` (the `@mdxcn` registry is set up in `components.json`)
+- **Type:** Geist Pixel (all five variants) for headlines, Geist Mono for body, via the `geist` package
+- **Data:** GitHub REST API, revalidated hourly (`lib/github.ts`)
 
 ## Development
 
@@ -29,18 +19,39 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## API
+## GitHub stats
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/votes` | Current vote totals |
-| `POST` | `/api/vote` | Body: `{ "choice": "React" }` — one of React, Vue, Svelte, Solid, Preact, HTML |
+`lib/github.ts` pulls profile, repos, and recent public events for `gravitinos`.
+Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
+otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
+also lifts the 60 req/h unauthenticated rate limit.
 
-## Deploy on Vercel
+The "last commit" timer uses the newest push event. With a token belonging to
+`gravitinos` (classic token with `repo` scope), private pushes such as
+tino.build count too; only the timestamp is shown, never the repo name.
+Without a token it only sees public pushes.
+If GitHub is unreachable, the stats block is hidden.
 
-1. Import this repository on Vercel.
-2. Build command: `bun run build`
-3. Install command: `bun install`
-4. Output is handled by Nitro’s Vercel integration (zero extra config).
+## Markdown view
 
-Votes persist via Nitro storage (`data` driver) on the deployment filesystem where supported.
+Every page renders an HTML and a raw-markdown version; the `[ html / md ]`
+switch (or `m`, or `?view=md`) flips `data-view` on `<html>`. An inline script
+applies the saved choice before first paint. The home page markdown is also
+served at `/index.md`. Figures in markdown use the mdxcn ASCII renderers from
+`registry/default/graph-knap`.
+
+## mdxcn
+
+Add or update components:
+
+```bash
+bunx shadcn@latest add @mdxcn/graph-table
+```
+
+## Effect v3 (local reference)
+
+```bash
+bun run clone:effect
+```
+
+Source lands in `reference/effect-v3/` (gitignored).
