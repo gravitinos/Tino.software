@@ -12,7 +12,7 @@ import { GITHUB_URL } from "@/lib/github"
 export const stack = [
   {
     label: "framework",
-    body: "Next.js 16 (App Router), React 19, Tailwind v4. Pages prerender as Server Components; GitHub data revalidates hourly.",
+    body: "Next.js 16 (App Router), React 19, Tailwind v4. Pages prerender as Server Components; GitHub data revalidates hourly, the last-commit time every 5 minutes.",
   },
   {
     label: "figures",

@@ -179,11 +179,11 @@ function GraphActivity({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-4">
-        {/* Focusable so keyboard users can scroll it when it overflows. */}
+        {/* Focusable so keyboard users can scroll the grid on narrow screens. */}
         <div
-          aria-label="Contribution calendar"
+          aria-label={`${title}, ${summary}`}
           className="scrollbar-graph overflow-x-auto"
-          role="group"
+          role="region"
           tabIndex={0}
         >
           <div

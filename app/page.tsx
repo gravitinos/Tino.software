@@ -14,7 +14,7 @@ import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
 import { GraphStat } from "@/registry/default/graph-stat/graph-stat"
 import { GraphTimer } from "@/registry/default/graph-timer/graph-timer"
 
-export const revalidate = 3600
+export const revalidate = 300
 
 const link =
   "text-foreground underline decoration-graph-frame underline-offset-4 hover:decoration-graph-accent"

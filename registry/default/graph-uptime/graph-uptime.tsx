@@ -74,11 +74,11 @@ function GraphUptime({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col items-center gap-4">
-        {/* Focusable so keyboard users can scroll it when it overflows. */}
+        {/* Focusable so keyboard users can scroll the grid on narrow screens. */}
         <div
-          aria-label="Uptime history"
+          aria-label={title}
           className="flex scrollbar-graph w-fit max-w-full flex-col gap-4 overflow-x-auto"
-          role="group"
+          role="region"
           tabIndex={0}
         >
           <div aria-hidden="true" className="flex flex-col gap-1 select-none">
