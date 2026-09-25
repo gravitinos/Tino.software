@@ -87,9 +87,9 @@ function GraphTabs({
           {tabs.map((tab) => (
             <Tabs.Tab
               className={cn(
-                "group flex shrink-0 items-center px-2 py-1.5 whitespace-nowrap text-graph-muted uppercase outline-none select-none",
+                "group flex shrink-0 items-center px-2 py-1.5 whitespace-nowrap text-graph-muted uppercase select-none",
                 "hover:text-foreground data-active:text-graph-accent data-disabled:text-graph-frame",
-                "focus-visible:outline-1 focus-visible:outline-graph-accent focus-visible:outline-dashed"
+                "focus-visible:-outline-offset-2"
               )}
               disabled={tab.disabled}
               key={valueOf(tab)}
@@ -115,7 +115,7 @@ function GraphTabs({
         <GraphRule />
         {tabs.map((tab) => (
           <Tabs.Panel
-            className="outline-none focus-visible:outline-1 focus-visible:-outline-offset-4 focus-visible:outline-graph-accent focus-visible:outline-dashed"
+            className="focus-visible:-outline-offset-4"
             keepMounted
             key={valueOf(tab)}
             value={valueOf(tab)}
