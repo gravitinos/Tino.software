@@ -42,7 +42,10 @@ Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
 otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
 also lifts the 60 req/h unauthenticated rate limit.
 
-The "last commit" timer uses the newest push event. With a token belonging to
+The "last commit" timer takes the newest of the most recently pushed repo's
+`pushed_at` (updates immediately) and the newest push event (can lag by hours,
+but covers repos the user doesn't own). Those two small requests refresh every
+5 minutes; the rest of the GitHub data stays hourly. With a token belonging to
 `gravitinos` (classic token with `repo` scope), private pushes such as
 tino.build count too; only the timestamp is shown, never the repo name.
 Without a token it only sees public pushes.
