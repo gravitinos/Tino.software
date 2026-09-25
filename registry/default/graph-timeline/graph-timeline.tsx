@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,8 +12,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -58,9 +54,6 @@ function GraphTimeline({
   corner,
   className,
 }: GraphTimelineProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const listed = listItems(children).map((item) => {
     const text = itemText(item)
     const { label: date, rest } = splitLabel(text)
@@ -84,24 +77,17 @@ function GraphTimeline({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.ol
-          className="flex flex-col"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <ol className="flex flex-col" role="list">
           {events.map((event, index) => {
             const state = event.state ?? "done"
             const last = index === events.length - 1
             const live = state === "now"
 
             return (
-              <motion.li
+              <li
                 key={`${event.date}-${event.label}`}
-                className="flex flex-col"
-                variants={item}
+                className="graph-enter flex flex-col"
+                style={staggerDelay(index, 0.05)}
               >
                 <div className="grid grid-cols-[1.25rem_7rem_minmax(0,1fr)] items-baseline gap-x-4">
                   <span
@@ -143,10 +129,10 @@ function GraphTimeline({
                     <span className="text-center text-graph-frame">│</span>
                   </div>
                 )}
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ol>
+        </ol>
       </GraphBody>
     </Graph>
   )

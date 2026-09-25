@@ -1,8 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   alignsOf,
@@ -20,10 +16,7 @@ import {
   tableOf,
   words,
 } from "@/registry/default/graph-frame/graph-frame"
-import {
-  fadeUp,
-  staggerList,
-} from "@/registry/default/graph-frame/graph-motion"
+import { staggerDelay } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 type GraphAlign = "left" | "right"
@@ -114,10 +107,12 @@ function GraphSheet({
       : alignProp) ??
     alignsOf(head?.children) ??
     markdownSections[0]?.align
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const columns = headers.length
+  const sectionStarts = sections.map((_, index) =>
+    sections
+      .slice(0, index)
+      .reduce((sum, section) => sum + section.rows.length, 0)
+  )
 
   function cellClass(index: number, extra?: string) {
     return cn(
@@ -156,13 +151,7 @@ function GraphSheet({
               </tr>
             </thead>
             {sections.map((section, sectionIndex) => (
-              <motion.tbody
-                initial={reduce ? false : "hidden"}
-                key={section.title}
-                variants={list}
-                viewport={{ once: true, amount: 0.4 }}
-                whileInView="show"
-              >
+              <tbody key={section.title}>
                 {sectionIndex > 0 ? (
                   <tr>
                     <td colSpan={columns} className="pt-4 pb-1">
@@ -179,7 +168,14 @@ function GraphSheet({
                   </td>
                 </tr>
                 {section.rows.map((row, rowIndex) => (
-                  <motion.tr key={rowIndex} variants={item}>
+                  <tr
+                    className="graph-enter"
+                    key={rowIndex}
+                    style={staggerDelay(
+                      sectionStarts[sectionIndex] + rowIndex,
+                      0.04
+                    )}
+                  >
                     {row.map((cell, cellIndex) => (
                       <td
                         className={cellClass(cellIndex, "whitespace-nowrap")}
@@ -189,9 +185,9 @@ function GraphSheet({
                         {cell}
                       </td>
                     ))}
-                  </motion.tr>
+                  </tr>
                 ))}
-              </motion.tbody>
+              </tbody>
             ))}
             {footer ? (
               <tfoot>

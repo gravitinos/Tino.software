@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,8 +12,7 @@ import {
 } from "@/registry/default/graph-frame/graph-frame"
 import {
   DIM_OPACITY,
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -95,9 +91,6 @@ function GraphMatrix({
           values: matrixValues(row.values.join(" ")),
         })) ?? []))
   ).map((row) => ({ ...row, label: row.label ?? "" }))
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const template = `minmax(6rem, 1fr) repeat(${columns.length}, minmax(4.5rem, 7rem))`
 
   return (
@@ -120,27 +113,20 @@ function GraphMatrix({
             ))}
           </div>
           <GraphRule />
-          <motion.ul
-            className="flex flex-col"
-            initial={reduce ? false : "hidden"}
-            role="list"
-            variants={list}
-            viewport={{ once: true, amount: 0.4 }}
-            whileInView="show"
-          >
-            {rows.map((row) => {
+          <ul className="flex flex-col" role="list">
+            {rows.map((row, rowIndex) => {
               const live = Boolean(accent) && row.label === accent
               const dim = Boolean(accent) && !live
 
               return (
-                <motion.li
-                  className="grid items-baseline"
+                <li
+                  className="graph-enter grid items-baseline"
                   key={row.label}
                   style={{
                     gridTemplateColumns: template,
                     opacity: dim ? DIM_OPACITY : undefined,
+                    ...staggerDelay(rowIndex, 0.04),
                   }}
-                  variants={item}
                 >
                   <span
                     className={cn(
@@ -162,10 +148,10 @@ function GraphMatrix({
                       {formatCell(row.values[index] ?? "")}
                     </span>
                   ))}
-                </motion.li>
+                </li>
               )
             })}
-          </motion.ul>
+          </ul>
         </div>
         <span className="sr-only">
           Matrix with {rows.length} rows and {columns.length} columns

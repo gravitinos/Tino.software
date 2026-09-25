@@ -1,7 +1,3 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import {
   Graph,
   GraphBody,
@@ -10,9 +6,8 @@ import {
   words,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
   resolveGlyphs,
-  staggerList,
+  staggerDelay,
   toneClass,
   type Glyphs,
   type GraphPalette,
@@ -57,9 +52,6 @@ function GraphUptime({
   className,
 }: GraphUptimeProps) {
   const days = words<UptimeStatus>(daysProp)
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const known = days.filter((day) => day !== "empty")
   const ok = known.filter((day) => day === "ok").length
   const percent = known.length === 0 ? 0 : Math.round((ok / known.length) * 100)
@@ -83,16 +75,13 @@ function GraphUptime({
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col items-center gap-4">
         <div className="flex scrollbar-graph w-fit max-w-full flex-col gap-4 overflow-x-auto">
-          <motion.div
-            aria-hidden="true"
-            className="flex flex-col gap-1 select-none"
-            initial={reduce ? false : "hidden"}
-            variants={list}
-            viewport={{ once: true, amount: 0.4 }}
-            whileInView="show"
-          >
+          <div aria-hidden="true" className="flex flex-col gap-1 select-none">
             {rows.map((row, rowIndex) => (
-              <motion.div key={rowIndex} variants={item}>
+              <div
+                className="graph-enter"
+                key={rowIndex}
+                style={staggerDelay(rowIndex, 0.05)}
+              >
                 <GraphTrack className="w-auto justify-start gap-0.5">
                   {row.map((day, index) => (
                     <GraphTick
@@ -103,9 +92,9 @@ function GraphUptime({
                     </GraphTick>
                   ))}
                 </GraphTrack>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <p className={cn("tabular-nums", tone.ok)}>{percent}%</p>
             {from || to ? (

@@ -1,7 +1,6 @@
-"use client"
-
 import * as React from "react"
 
+import { GraphReveal } from "@/registry/default/graph-frame/graph-reveal"
 import { cn } from "@/lib/utils"
 
 function GraphCorners({ mark = "+" }: { mark?: string }) {
@@ -659,6 +658,7 @@ function Graph({
     >
       {title ? <GraphTitle id={captionId}>{title}</GraphTitle> : null}
       <GraphCorners mark={corner} />
+      <GraphReveal />
       {children}
     </figure>
   )

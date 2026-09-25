@@ -1,7 +1,3 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import {
   fraction,
   Graph,
@@ -10,8 +6,8 @@ import {
   GraphTrack,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
+  enterDelay,
   fillDelay,
-  graphTransition,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -42,7 +38,6 @@ function GraphMeter({
   className,
 }: GraphMeterProps) {
   const value = fraction(valueProp)
-  const reduce = useReducedMotion()
   const clamped = Math.min(1, Math.max(0, value))
   const filled = Math.round(clamped * ticks)
   const marks = trackMarks(glyphs, {
@@ -71,17 +66,12 @@ function GraphMeter({
                   }
                   key={index}
                 >
-                  <motion.span
-                    className="block w-full"
-                    initial={reduce || !isFilled ? false : { opacity: 0 }}
-                    transition={graphTransition(reduce, {
-                      delay: fillDelay(reduce, index),
-                    })}
-                    viewport={{ once: true }}
-                    whileInView={{ opacity: 1 }}
+                  <span
+                    className={cn("block w-full", isFilled && "graph-fade")}
+                    style={isFilled ? enterDelay(fillDelay(index)) : undefined}
                   >
                     {isFilled ? marks.fill : marks.empty}
-                  </motion.span>
+                  </span>
                 </GraphTick>
               )
             })}

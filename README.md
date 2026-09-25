@@ -6,7 +6,8 @@ Personal site. Next.js (App Router) + shadcn, with figures drawn by
 ## Stack
 
 - **Framework:** Next.js 16, Tailwind v4, shadcn (`components.json`)
-- **Figures:** mdxcn, vendored under `registry/default` (the `@mdxcn` registry is set up in `components.json`)
+- **Figures:** mdxcn, forked under `registry/default` (the `@mdxcn` registry is set up in `components.json`)
+- **Own components:** `registry/tino`, built on the mdxcn frame and [Base UI](https://base-ui.com) for interactive parts
 - **Type:** Geist Pixel (all five variants) for headlines, Geist Mono for body, via the `geist` package
 - **Data:** GitHub REST API, revalidated hourly (`lib/github.ts`)
 
@@ -42,11 +43,28 @@ served at `/index.md`. Figures in markdown use the mdxcn ASCII renderers from
 
 ## mdxcn
 
-Add or update components:
+The copy in `registry/default` is a fork: the components are Server Components
+and their enter animations are CSS (`graph-enter` / `graph-fade` in
+`app/globals.css`) instead of `motion`. A small client probe,
+`graph-frame/graph-reveal.tsx`, inside `<Graph>` marks the figure
+`data-inview` to start them. Only `graph-timer` and `graph-countdown` stay
+client components, because they tick.
+
+Pulling a new component from upstream still works, but it arrives written
+against `motion`; convert it the same way before using it:
 
 ```bash
 bunx shadcn@latest add @mdxcn/graph-table
 ```
+
+## registry/tino
+
+Components that fit the mdxcn look but are not part of it. They reuse the
+`graph-frame` base and the `--graph-*` tokens. Interactive behavior (focus,
+keyboard, ARIA) comes from Base UI; keep the component itself a Server
+Component and let only the Base UI parts hydrate.
+
+- `graph-tabs`: panels in one frame. `## heading` sections or `<Tab label>` children.
 
 ## Effect v3 (local reference)
 

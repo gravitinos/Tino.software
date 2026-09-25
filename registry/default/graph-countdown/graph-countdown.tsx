@@ -1,7 +1,5 @@
 "use client"
 
-import { motion, useReducedMotion } from "motion/react"
-
 import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
 import {
   formatHms,
@@ -9,7 +7,6 @@ import {
   useGraphNow,
 } from "@/registry/default/graph-frame/graph-clock"
 import {
-  fadeUp,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -34,8 +31,6 @@ function GraphCountdown({
   corner,
   className,
 }: GraphCountdownProps) {
-  const reduce = useReducedMotion()
-  const enter = fadeUp(reduce)
   const now = useGraphNow()
   const target = parseInstant(to)
   const remaining =
@@ -47,13 +42,7 @@ function GraphCountdown({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.div
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          variants={enter}
-          viewport={{ once: true, amount: 0.5 }}
-          whileInView="show"
-        >
+        <div className="graph-enter flex flex-col gap-2">
           <p
             className={cn(
               "text-3xl tracking-tight tabular-nums sm:text-4xl",
@@ -63,7 +52,7 @@ function GraphCountdown({
             {value}
           </p>
           {caption ? <p className="text-graph-muted">{caption}</p> : null}
-        </motion.div>
+        </div>
         <span className="sr-only">
           {finished ? done : `remaining ${value}`}
         </span>

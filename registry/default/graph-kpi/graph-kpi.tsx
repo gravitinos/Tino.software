@@ -1,7 +1,3 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import {
   Graph,
   GraphBody,
@@ -11,9 +7,8 @@ import {
 } from "@/registry/default/graph-frame/graph-frame"
 import {
   DIM_OPACITY,
-  fadeUp,
+  enterDelay,
   fillDelay,
-  graphTransition,
   isMonoPalette,
   resolveGlyphs,
   toneClass,
@@ -49,8 +44,6 @@ function GraphKpi({
   className,
 }: GraphKpiProps) {
   const data = numbers(dataProp)
-  const reduce = useReducedMotion()
-  const enter = fadeUp(reduce)
   const max = Math.max(...data, 1)
   const last = data.length - 1
   const set = glyphs == null ? SPARK_DEFAULT : resolveGlyphs(glyphs)
@@ -62,13 +55,7 @@ function GraphKpi({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-4">
-        <motion.div
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          variants={enter}
-          viewport={{ once: true, amount: 0.5 }}
-          whileInView="show"
-        >
+        <div className="graph-enter flex flex-col gap-2">
           <p
             className={cn(
               "text-3xl tracking-tight tabular-nums sm:text-4xl",
@@ -83,7 +70,7 @@ function GraphKpi({
               <p className="text-graph-muted tabular-nums">{hint}</p>
             ) : null}
           </div>
-        </motion.div>
+        </div>
         {points.length > 0 ? (
           <GraphTrack className="justify-start gap-0.5">
             {points.map((glyph, index) => {
@@ -91,24 +78,21 @@ function GraphKpi({
 
               return (
                 <GraphTick className="flex-none" key={`${glyph}-${index}`}>
-                  <motion.span
+                  <span
                     className={cn(
+                      "graph-fade",
                       live
                         ? toneClass(palette, "primary")
                         : toneClass(palette, "secondary")
                     )}
-                    initial={reduce ? false : { opacity: 0 }}
-                    transition={graphTransition(reduce, {
-                      delay: fillDelay(reduce, index),
-                    })}
-                    viewport={{ once: true }}
-                    whileInView={{
+                    style={{
                       opacity:
                         live || !isMonoPalette(palette) ? 1 : DIM_OPACITY,
+                      ...enterDelay(fillDelay(index)),
                     }}
                   >
                     {glyph}
-                  </motion.span>
+                  </span>
                 </GraphTick>
               )
             })}

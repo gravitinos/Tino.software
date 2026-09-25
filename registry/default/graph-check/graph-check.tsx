@@ -1,7 +1,4 @@
-"use client"
-
 import { Children, isValidElement, type ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,8 +12,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -79,9 +75,6 @@ function GraphCheck({
   corner,
   className,
 }: GraphCheckProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const items = (itemsProp ?? checksOf(children)).map((entry) => ({
     ...entry,
     label: entry.label ?? "",
@@ -90,23 +83,16 @@ function GraphCheck({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.ul
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {items.map((entry) => {
+        <ul className="flex flex-col gap-2" role="list">
+          {items.map((entry, index) => {
             const done = Boolean(entry.done)
             const mark = done ? "[x]" : "[ ]"
 
             return (
-              <motion.li
-                className="grid grid-cols-[2.5rem_minmax(0,1fr)] items-baseline gap-x-3"
+              <li
+                className="graph-enter grid grid-cols-[2.5rem_minmax(0,1fr)] items-baseline gap-x-3"
                 key={entry.label}
-                variants={item}
+                style={staggerDelay(index, 0.05)}
               >
                 <span
                   aria-hidden="true"
@@ -127,10 +113,10 @@ function GraphCheck({
                     <span className="text-graph-muted">{entry.note}</span>
                   ) : null}
                 </span>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ul>
+        </ul>
         <span className="sr-only">
           {items.filter((entry) => entry.done).length} of {items.length} done
         </span>

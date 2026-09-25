@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childElements,
@@ -16,8 +13,8 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
+  enterDelay,
   fillDelay,
-  graphTransition,
   isMonoPalette,
   seriesClass,
   trackMarks,
@@ -100,7 +97,6 @@ function GraphCells({
     cells: entry.cells ?? gridCells(entry.children),
   }))
   const items = itemsProp ?? (listed.length > 0 ? listed : tagged)
-  const reduce = useReducedMotion()
   const marks = trackMarks(glyphs, {
     empty: "·",
     rest: "░",
@@ -120,28 +116,31 @@ function GraphCells({
                       const filled = cell === 1
 
                       return (
-                        <motion.span
+                        <span
                           className={cn(
                             "w-[1ch] text-center select-none",
                             filled
-                              ? isMonoPalette(palette)
-                                ? "text-graph-accent"
-                                : seriesClass(palette, itemIndex)
+                              ? cn(
+                                  "graph-fade",
+                                  isMonoPalette(palette)
+                                    ? "text-graph-accent"
+                                    : seriesClass(palette, itemIndex)
+                                )
                               : "text-graph-frame"
                           )}
-                          initial={reduce || !filled ? false : { opacity: 0 }}
                           key={cellIndex}
-                          transition={graphTransition(reduce, {
-                            delay: fillDelay(
-                              reduce,
-                              itemIndex * 8 + rowIndex * 5 + cellIndex
-                            ),
-                          })}
-                          viewport={{ once: true }}
-                          whileInView={{ opacity: 1 }}
+                          style={
+                            filled
+                              ? enterDelay(
+                                  fillDelay(
+                                    itemIndex * 8 + rowIndex * 5 + cellIndex
+                                  )
+                                )
+                              : undefined
+                          }
                         >
                           {filled ? marks.fill : marks.empty}
-                        </motion.span>
+                        </span>
                       )
                     })}
                   </div>

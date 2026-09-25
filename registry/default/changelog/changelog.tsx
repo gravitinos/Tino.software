@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,8 +12,7 @@ import {
   splitLabel,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -100,9 +96,6 @@ function Changelog({
   corner,
   className,
 }: ChangelogProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const changes = changesOf(children)
 
   return (
@@ -121,14 +114,7 @@ function Changelog({
             <GraphRule />
           </>
         ) : null}
-        <motion.ul
-          className="flex flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <ul className="flex flex-col gap-2" role="list">
           {changes.map((change, index) => {
             const type = change.type ?? "change"
             const tone =
@@ -139,10 +125,10 @@ function Changelog({
                   : "text-foreground"
 
             return (
-              <motion.li
-                className="grid grid-cols-[1.25rem_5.5rem_minmax(0,1fr)] items-baseline gap-x-3 max-sm:grid-cols-[1.25rem_minmax(0,1fr)]"
+              <li
+                className="graph-enter grid grid-cols-[1.25rem_5.5rem_minmax(0,1fr)] items-baseline gap-x-3 max-sm:grid-cols-[1.25rem_minmax(0,1fr)]"
                 key={`${index}-${type}`}
-                variants={item}
+                style={staggerDelay(index, 0.05)}
               >
                 <span
                   aria-hidden="true"
@@ -160,10 +146,10 @@ function Changelog({
                 >
                   {change.children}
                 </GraphProse>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ul>
+        </ul>
       </GraphBody>
     </Graph>
   )

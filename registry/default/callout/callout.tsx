@@ -1,14 +1,10 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   Graph,
   GraphBody,
   GraphProse,
 } from "@/registry/default/graph-frame/graph-frame"
-import { fadeUp } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 type CalloutType = "note" | "tip" | "warning" | "danger"
@@ -54,8 +50,6 @@ function Callout({
   corner,
   className,
 }: CalloutProps) {
-  const reduce = useReducedMotion()
-
   return (
     <Graph
       className={className}
@@ -64,13 +58,7 @@ function Callout({
       title={title ?? type}
     >
       <GraphBody className="py-6 sm:py-6">
-        <motion.div
-          className="grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-x-3"
-          initial={reduce ? false : "hidden"}
-          variants={fadeUp(reduce)}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <div className="graph-enter grid grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-x-3">
           <span
             aria-hidden="true"
             className={cn(
@@ -81,7 +69,7 @@ function Callout({
             {glyph[type]}
           </span>
           <GraphProse className="text-foreground">{children}</GraphProse>
-        </motion.div>
+        </div>
       </GraphBody>
     </Graph>
   )

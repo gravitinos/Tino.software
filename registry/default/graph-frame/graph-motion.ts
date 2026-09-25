@@ -1,56 +1,25 @@
-import type { Transition, Variants } from "motion/react"
+import type { CSSProperties } from "react"
 
-export const easeOutCubic = [0.215, 0.61, 0.355, 1] as const
+/**
+ * Enter animations are plain CSS (`graph-enter`, `graph-fade` in
+ * globals.css). They wait until `GraphReveal` marks the figure in view, and
+ * skip themselves under reduced motion. Set the start time with these.
+ */
 
 export const DIM_OPACITY = 0.4
 
-export function graphTransition(
-  reduce: boolean | null,
-  extras?: Transition
-): Transition {
-  if (reduce) {
-    return { duration: 0 }
-  }
-
-  return {
-    duration: 0.22,
-    ease: easeOutCubic,
-    ...extras,
-  }
+/** Inline `--graph-delay` for a `graph-enter` / `graph-fade` element. */
+export function enterDelay(seconds: number): CSSProperties {
+  return { "--graph-delay": `${Math.round(seconds * 1000)}ms` } as CSSProperties
 }
 
-export function fadeUp(reduce: boolean | null): Variants {
-  if (reduce) {
-    return {
-      hidden: { opacity: 1, transform: "translateY(0px)" },
-      show: { opacity: 1, transform: "translateY(0px)" },
-    }
-  }
-
-  return {
-    hidden: { opacity: 0, transform: "translateY(8px)" },
-    show: {
-      opacity: 1,
-      transform: "translateY(0px)",
-      transition: graphTransition(false),
-    },
-  }
+/** Delay for the nth child of a staggered list. */
+export function staggerDelay(index: number, stagger = 0.04, base = 0) {
+  return enterDelay(base + index * stagger)
 }
 
-export function staggerList(reduce: boolean | null, stagger = 0.04): Variants {
-  return {
-    hidden: {},
-    show: {
-      transition: reduce ? { duration: 0 } : { staggerChildren: stagger },
-    },
-  }
-}
-
-export function fillDelay(reduce: boolean | null, index: number, step = 0.03) {
-  if (reduce) {
-    return 0
-  }
-
+/** Delay for the nth filled cell of a track. Capped so long tracks finish. */
+export function fillDelay(index: number, step = 0.03) {
   return Math.min(index * step, 0.28)
 }
 

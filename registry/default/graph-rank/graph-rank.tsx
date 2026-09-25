@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -17,8 +14,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -71,9 +67,6 @@ function GraphRank({
   corner,
   className,
 }: GraphRankProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.05)
   const listed = listItems(children).map((item) => {
     const { token, rest } = firstToken(itemText(item))
     return {
@@ -103,14 +96,8 @@ function GraphRank({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-3">
-        <motion.ol
-          className="flex w-full list-none flex-col gap-2"
-          initial={reduce ? false : "hidden"}
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
-          {items.map((entry) => {
+        <ol className="flex w-full list-none flex-col gap-2">
+          {items.map((entry, rank) => {
             const filled = Math.min(
               ticks,
               Math.round((Math.max(entry.value, 0) / peak) * ticks)
@@ -118,11 +105,11 @@ function GraphRank({
             const shown = formatValue(entry)
 
             return (
-              <motion.li
+              <li
                 aria-label={`${entry.label} ${shown}`}
-                className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,7rem)] items-center gap-x-2 sm:gap-x-4"
+                className="graph-enter grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_minmax(0,7rem)] items-center gap-x-2 sm:gap-x-4"
                 key={entry.label}
-                variants={item}
+                style={staggerDelay(rank, 0.05)}
               >
                 <span className="truncate text-foreground">{entry.label}</span>
                 <span className="flex min-w-0 items-center">
@@ -160,10 +147,10 @@ function GraphRank({
                 <span className="text-right text-graph-muted tabular-nums">
                   {shown}
                 </span>
-              </motion.li>
+              </li>
             )
           })}
-        </motion.ol>
+        </ol>
       </GraphBody>
     </Graph>
   )

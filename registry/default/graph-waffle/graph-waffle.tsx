@@ -1,15 +1,11 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import {
   fraction,
   Graph,
   GraphBody,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
+  enterDelay,
   fillDelay,
-  graphTransition,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -42,7 +38,6 @@ function GraphWaffle({
   className,
 }: GraphWaffleProps) {
   const value = fraction(valueProp)
-  const reduce = useReducedMotion()
   const clamped = Math.min(1, Math.max(0, value))
   const filled = Math.round(clamped * cells)
   const rows = Math.ceil(cells / columns)
@@ -69,23 +64,22 @@ function GraphWaffle({
                 const isFilled = index < filled
 
                 return (
-                  <motion.span
+                  <span
                     className={cn(
                       "min-w-[1ch] flex-1 text-center",
                       isFilled
-                        ? toneClass(palette, "primary")
+                        ? cn("graph-fade", toneClass(palette, "primary"))
                         : "text-graph-frame"
                     )}
-                    initial={reduce || !isFilled ? false : { opacity: 0 }}
                     key={column}
-                    transition={graphTransition(reduce, {
-                      delay: fillDelay(reduce, index, 0.006),
-                    })}
-                    viewport={{ once: true }}
-                    whileInView={{ opacity: 1 }}
+                    style={
+                      isFilled
+                        ? enterDelay(fillDelay(index, 0.006))
+                        : undefined
+                    }
                   >
                     {isFilled ? marks.fill : marks.empty}
-                  </motion.span>
+                  </span>
                 )
               })}
             </div>

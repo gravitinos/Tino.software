@@ -1,7 +1,4 @@
-"use client"
-
 import * as React from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import { GraphArrow } from "@/registry/default/graph-frame/graph-arrow"
 import {
@@ -15,8 +12,7 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
-  staggerList,
+  staggerDelay,
   toneClass as paletteTone,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -147,27 +143,18 @@ function GraphFlow({
   corner,
   className,
 }: GraphFlowProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.08)
   const tones = nodeTone(palette)
   const rows = rowsProp ?? rowsOf(children)
 
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody className="flex flex-col gap-7">
-        <motion.div
-          className="flex flex-col gap-7"
-          initial={reduce ? false : "hidden"}
-          variants={list}
-          viewport={{ once: true, amount: 0.5 }}
-          whileInView="show"
-        >
+        <div className="flex flex-col gap-7">
           {rows.map((row, rowIndex) => (
-            <motion.div
+            <div
               key={rowIndex}
-              className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 sm:flex-nowrap"
-              variants={item}
+              className="graph-enter flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 sm:flex-nowrap"
+              style={staggerDelay(rowIndex, 0.08)}
             >
               {row.nodes.map((node, nodeIndex) => {
                 const tone = node.tone ?? "default"
@@ -192,9 +179,9 @@ function GraphFlow({
                   </div>
                 )
               })}
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </GraphBody>
     </Graph>
   )

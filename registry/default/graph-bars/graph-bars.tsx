@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import { GraphArrow } from "@/registry/default/graph-frame/graph-arrow"
 import {
@@ -17,8 +14,8 @@ import {
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
+  enterDelay,
   fillDelay,
-  graphTransition,
   toneClass,
   trackMarks,
   type Glyphs,
@@ -70,7 +67,6 @@ function MiniBars({
   fill: string
   palette?: GraphPalette
 }) {
-  const reduce = useReducedMotion()
   const max = Math.max(...values, 1)
 
   return (
@@ -85,25 +81,27 @@ function MiniBars({
               const on = fromBottom <= level
 
               return (
-                <motion.span
+                <span
                   className={cn(
                     "h-[1em] w-full text-center",
                     on
-                      ? tone === "accent"
-                        ? toneClass(palette, "primary")
-                        : toneClass(palette, "secondary")
+                      ? cn(
+                          "graph-fade",
+                          tone === "accent"
+                            ? toneClass(palette, "primary")
+                            : toneClass(palette, "secondary")
+                        )
                       : "text-transparent"
                   )}
-                  initial={reduce || !on ? false : { opacity: 0 }}
                   key={row}
-                  transition={graphTransition(reduce, {
-                    delay: delay + fillDelay(reduce, index, 0.03),
-                  })}
-                  viewport={{ once: true }}
-                  whileInView={{ opacity: 1 }}
+                  style={
+                    on
+                      ? enterDelay(delay + fillDelay(index, 0.03))
+                      : undefined
+                  }
                 >
                   {on ? fill : " "}
-                </motion.span>
+                </span>
               )
             })}
           </span>

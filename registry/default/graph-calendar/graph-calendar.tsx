@@ -1,16 +1,11 @@
-"use client"
-
-import { motion, useReducedMotion } from "motion/react"
-
 import {
   Graph,
   GraphBody,
   numbers,
 } from "@/registry/default/graph-frame/graph-frame"
 import {
-  fadeUp,
   isMonoPalette,
-  staggerList,
+  staggerDelay,
   toneClass,
   type GraphPalette,
 } from "@/registry/default/graph-frame/graph-motion"
@@ -91,9 +86,6 @@ function GraphCalendar({
   className,
 }: GraphCalendarProps) {
   const marks = typeof marksProp === "string" ? numbers(marksProp) : marksProp
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.04)
   const monthIndex = month - 1
   const days = monthLength(year, monthIndex)
   const pad = leadingBlanks(year, monthIndex, weekStartsOn)
@@ -128,19 +120,12 @@ function GraphCalendar({
             </span>
           ))}
         </div>
-        <motion.div
-          aria-hidden="true"
-          className="flex flex-col gap-1"
-          initial={reduce ? false : "hidden"}
-          variants={list}
-          viewport={{ once: true, amount: 0.4 }}
-          whileInView="show"
-        >
+        <div aria-hidden="true" className="flex flex-col gap-1">
           {weeks.map((week, weekIndex) => (
-            <motion.div
-              className="grid grid-cols-7 justify-items-center"
+            <div
+              className="graph-enter grid grid-cols-7 justify-items-center"
               key={weekIndex}
-              variants={item}
+              style={staggerDelay(weekIndex, 0.04)}
             >
               {week.map((day, dayIndex) => {
                 const inMonth = day != null
@@ -167,9 +152,9 @@ function GraphCalendar({
                   </span>
                 )
               })}
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
         <span className="sr-only">
           {MONTHS[monthIndex]} {year}
           {today ? `, today ${today}` : ""}

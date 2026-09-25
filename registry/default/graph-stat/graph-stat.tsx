@@ -1,7 +1,4 @@
-"use client"
-
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
 
 import {
   childItems,
@@ -15,10 +12,7 @@ import {
   splitDash,
   textOf,
 } from "@/registry/default/graph-frame/graph-frame"
-import {
-  fadeUp,
-  staggerList,
-} from "@/registry/default/graph-frame/graph-motion"
+import { staggerDelay } from "@/registry/default/graph-frame/graph-motion"
 import { cn } from "@/lib/utils"
 
 const columnClass: Record<number, string> = {
@@ -55,9 +49,6 @@ function GraphStat({
   corner,
   className,
 }: GraphStatProps) {
-  const reduce = useReducedMotion()
-  const item = fadeUp(reduce)
-  const list = staggerList(reduce, 0.06)
   const listed = listItems(children).map((item) => {
     const { token, rest } = firstToken(itemText(item))
     const { label, rest: hint } = splitDash(rest)
@@ -81,19 +72,12 @@ function GraphStat({
   return (
     <Graph title={title} className={className} corner={corner}>
       <GraphBody>
-        <motion.ul
-          className={cn("grid gap-8", columnClass[columns])}
-          initial={reduce ? false : "hidden"}
-          role="list"
-          variants={list}
-          viewport={{ once: true, amount: 0.5 }}
-          whileInView="show"
-        >
-          {items.map((entry) => (
-            <motion.li
-              className="flex flex-col gap-2"
+        <ul className={cn("grid gap-8", columnClass[columns])} role="list">
+          {items.map((entry, index) => (
+            <li
+              className="graph-enter flex flex-col gap-2"
               key={entry.label}
-              variants={item}
+              style={staggerDelay(index, 0.06)}
             >
               <p
                 className={cn(
@@ -107,9 +91,9 @@ function GraphStat({
               {entry.hint ? (
                 <p className="text-graph-muted">{entry.hint}</p>
               ) : null}
-            </motion.li>
+            </li>
           ))}
-        </motion.ul>
+        </ul>
       </GraphBody>
     </Graph>
   )
