@@ -16,7 +16,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "tino.software",
   description:
-    "Tino's corner of the internet. GitHub activity, projects, and (soon) a resume, drawn with mdxcn.",
+    "Tino. Software. github.com/gravitinos",
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
