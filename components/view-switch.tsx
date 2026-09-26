@@ -20,24 +20,8 @@ function setView(view: View) {
   }
 }
 
-/** Swaps views behind a scanline wipe, where the browser supports it. */
-function switchView(view: View) {
-  const root = document.documentElement
-  if ((root.dataset.view === "md" ? "md" : "html") === view) return
-  if (
-    !document.startViewTransition ||
-    matchMedia("(prefers-reduced-motion: reduce)").matches
-  ) {
-    return setView(view)
-  }
-  root.classList.add("vt-wipe")
-  document
-    .startViewTransition(() => setView(view))
-    .finished.finally(() => root.classList.remove("vt-wipe"))
-}
-
 function toggle() {
-  switchView(document.documentElement.dataset.view === "md" ? "html" : "md")
+  setView(document.documentElement.dataset.view === "md" ? "html" : "md")
 }
 
 /** Global html / markdown switch. Press `m` to toggle. */
@@ -65,7 +49,7 @@ export function ViewSwitch({ className }: { className?: string }) {
       <span className="text-graph-frame">[</span>
       <button
         type="button"
-        onClick={() => switchView("html")}
+        onClick={() => setView("html")}
         className={cn(item, "not-in-data-[view=md]:text-foreground")}
       >
         html
@@ -73,7 +57,7 @@ export function ViewSwitch({ className }: { className?: string }) {
       <span className="text-graph-frame">/</span>
       <button
         type="button"
-        onClick={() => switchView("md")}
+        onClick={() => setView("md")}
         className={cn(item, "in-data-[view=md]:text-foreground")}
       >
         md

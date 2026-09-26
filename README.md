@@ -73,11 +73,10 @@ the dark-theme colors are repeated there as hex.
 
 ## Transitions
 
-The `[ html / md ]` switch wipes the new view in top-down with the View
-Transitions API. Links between pages use React's `<ViewTransition>`
-(`components/page-transition.tsx`): content slides by direction and the big
-word morphs from one page to the next. Reduced motion turns both off. Figures in markdown use the mdxcn ASCII renderers from
-`registry/default/graph-knap`.
+Following a link glides the big pixel word into the next page's word (React's
+`<ViewTransition>`, `components/page-transition.tsx`); the rest of the page
+swaps instantly. The home page sets `data-still`, so its figures render in
+place instead of fading in on scroll.
 
 ## mdxcn
 
