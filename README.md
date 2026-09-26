@@ -56,7 +56,18 @@ If GitHub is unreachable, the stats block is hidden.
 Every page renders an HTML and a raw-markdown version; the `[ html / md ]`
 switch (or `m`, or `?view=md`) flips `data-view` on `<html>`. An inline script
 applies the saved choice before first paint. The home page markdown is also
-served at `/index.md`. Figures in markdown use the mdxcn ASCII renderers from
+served at `/index.md`.
+
+`proxy.ts` serves the markdown twin at the page's own URL when the request
+asks for `text/markdown` or comes from a terminal client (`curl`, `wget`,
+HTTPie, `xh`), so `curl tino.software` prints markdown. Browsers still get HTML.
+
+## Transitions
+
+The `[ html / md ]` switch wipes the new view in top-down with the View
+Transitions API. Links between pages use React's `<ViewTransition>`
+(`components/page-transition.tsx`): content slides by direction and the big
+word morphs from one page to the next. Reduced motion turns both off. Figures in markdown use the mdxcn ASCII renderers from
 `registry/default/graph-knap`.
 
 ## mdxcn
