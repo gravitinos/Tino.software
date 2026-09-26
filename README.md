@@ -62,6 +62,15 @@ served at `/index.md`.
 asks for `text/markdown` or comes from a terminal client (`curl`, `wget`,
 HTTPie, `xh`), so `curl tino.software` prints markdown. Browsers still get HTML.
 
+## Link previews
+
+`opengraph-image.tsx` next to each page draws its share card with `next/og`:
+the big pixel word, the page's line, and for `/` the contribution grid and last
+commit (refreshed with the page, every 5 minutes). Shared pieces live in
+`lib/og.tsx`. The renderer can't read woff2 or `oklch()`, so Geist Pixel and
+Geist Mono are copied as TTF into `assets/fonts` (OFL, license alongside) and
+the dark-theme colors are repeated there as hex.
+
 ## Transitions
 
 The `[ html / md ]` switch wipes the new view in top-down with the View

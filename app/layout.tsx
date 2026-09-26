@@ -16,9 +16,12 @@ import { cn } from "@/lib/utils"
 import "./globals.css"
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://tino.software"),
   title: "tino.software",
   description:
     "Tino. Software. github.com/gravitinos",
+  openGraph: { siteName: "tino.software", type: "website" },
+  twitter: { card: "summary_large_image" },
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
