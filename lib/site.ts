@@ -56,6 +56,7 @@ export const views = [
   { label: "key", value: "m" },
   { label: "query", value: "?view=md" },
   { label: "raw", value: "/index.md, /site.md" },
+  { label: "curl", value: "curl tino.software" },
 ]
 
 export const commands = ["$ bun install", "$ bun run dev", "$ bun run build"]

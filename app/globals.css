@@ -235,6 +235,11 @@
     animation-play-state: running;
   }
 
+  /* Pages that should read as one still picture (the home page). */
+  [data-still] :is(.graph-enter, .graph-fade) {
+    animation: none;
+  }
+
   @media (prefers-reduced-motion: reduce), (scripting: none) {
     .graph-enter,
     .graph-fade {
@@ -253,5 +258,28 @@
     .graph-panel {
       animation: none;
     }
+  }
+}
+
+/*
+ * View transitions: following a link glides the big page word into the next
+ * page's word (components/page-transition.tsx). Nothing else animates.
+ */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(.morph) {
+  animation-duration: 250ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
   }
 }

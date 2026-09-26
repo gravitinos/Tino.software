@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { TitleTransition } from "@/components/page-transition"
 import { PixelWord } from "@/components/pixel-word"
 import { Swappable } from "@/components/view-mode"
 import {
@@ -7,17 +8,28 @@ import {
   getGitHubStats,
   GITHUB_URL,
   GITHUB_USER,
+  type GitHubStats,
 } from "@/lib/github"
-import { homeMarkdown, statItems } from "@/lib/markdown"
-import { GraphActivity } from "@/registry/default/graph-activity/graph-activity"
-import { Graph, GraphBody } from "@/registry/default/graph-frame/graph-frame"
-import { GraphStat } from "@/registry/default/graph-stat/graph-stat"
+import { formatCompact, homeMarkdown, statItems } from "@/lib/markdown"
 import { GraphTimer } from "@/registry/default/graph-timer/graph-timer"
+import { GraphYear } from "@/registry/tino/graph-year/graph-year"
 
 export const revalidate = 300
 
 const link =
   "text-foreground underline decoration-graph-frame underline-offset-4 hover:decoration-graph-accent"
+
+/** Repos, stars and start year in one line; contributions sit in the title. */
+function statsLine(gh: GitHubStats) {
+  return statItems(gh)
+    .filter((item) => !item.label.startsWith("contributions"))
+    .map((item) => {
+      if (item.label === "since") return `since ${item.value}`
+      const label = item.value === "1" ? item.label.replace(/s$/, "") : item.label
+      return `${item.value} ${label}`
+    })
+    .join(" · ")
+}
 
 export default async function Page() {
   const gh = await getGitHubStats()
@@ -25,51 +37,47 @@ export default async function Page() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 sm:px-8">
       <Swappable title="tino" markdown={homeMarkdown(gh)}>
-        <main className="flex flex-1 flex-col gap-16 py-20 sm:py-32">
-          <section className="flex flex-col gap-8">
+        <main data-still className="flex flex-1 flex-col gap-14 py-20 sm:gap-20 sm:py-28">
+          <section className="flex flex-col gap-6">
             <h1>
-              <PixelWord text="tino" className="text-[clamp(5rem,22vw,11rem)]" />
+              <TitleTransition>
+                <PixelWord text="tino" className="-mb-[0.22em] text-[clamp(5rem,22vw,11rem)]" />
+              </TitleTransition>
             </h1>
-            <p className="text-sm text-graph-muted">
-              Software.{" "}
-              <a className={link} href={GITHUB_URL} rel="noreferrer" target="_blank">
-                github.com/{GITHUB_USER}
-              </a>
-            </p>
-          </section>
-
-          <section className="grid grid-cols-1 gap-10 sm:grid-cols-2">
-            <Graph title="Experiments">
-              <GraphBody className="flex flex-col gap-2">
-                <a
-                  className="text-3xl tracking-tight text-graph-accent hover:underline hover:underline-offset-4 sm:text-4xl"
-                  href={BUILD_URL}
-                  rel="noreferrer"
-                  target="_blank"
-                >
+            <div className="flex flex-col gap-2 text-sm text-graph-muted">
+              <p>
+                Software.{" "}
+                <a className={link} href={GITHUB_URL} rel="noreferrer" target="_blank">
+                  github.com/{GITHUB_USER}
+                </a>
+              </p>
+              <p>
+                Experiments at{" "}
+                <a className={link} href={BUILD_URL} rel="noreferrer" target="_blank">
                   tino.build
                 </a>
-                <p className="text-graph-muted">kitchen sink, things in progress</p>
-              </GraphBody>
-            </Graph>
-            {gh.lastPushAt ? (
-              <GraphTimer
-                title="Last commit"
-                kind="ago"
-                at={gh.lastPushAt}
-                caption="pushed to github"
-              />
-            ) : null}
+                , the kitchen sink.
+              </p>
+            </div>
           </section>
 
           {gh.ok ? (
-            <section className="flex flex-col gap-10">
-              <GraphStat title="GitHub" items={statItems(gh)} />
+            <section className="flex flex-col gap-10 sm:flex-row sm:items-stretch sm:gap-6">
               {gh.contributions.length > 0 ? (
-                <GraphActivity
-                  title="Last year"
+                <GraphYear
+                  title={`Last year · ${formatCompact(gh.contributionsTotal)}`}
                   days={gh.contributions}
-                  legend={false}
+                  caption={statsLine(gh)}
+                  className="sm:flex-1"
+                />
+              ) : null}
+              {gh.lastPushAt ? (
+                <GraphTimer
+                  title="Last commit"
+                  kind="ago"
+                  at={gh.lastPushAt}
+                  caption="pushed to github"
+                  className="sm:w-56 sm:shrink-0"
                 />
               ) : null}
             </section>

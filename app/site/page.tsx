@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 
+import { TitleTransition } from "@/components/page-transition"
 import { PixelWord } from "@/components/pixel-word"
 import { Swappable } from "@/components/view-mode"
 import { GITHUB_URL } from "@/lib/github"
@@ -32,7 +33,9 @@ export default function Page() {
         <main className="flex flex-1 flex-col gap-16 py-20 sm:py-32">
           <section className="flex flex-col gap-8">
             <h1>
-              <PixelWord text="site" className="text-[clamp(4rem,16vw,8rem)]" />
+              <TitleTransition>
+                <PixelWord text="site" className="text-[clamp(4rem,16vw,8rem)]" />
+              </TitleTransition>
             </h1>
             <p className="text-sm text-graph-muted">
               How tino.software is built.{" "}
