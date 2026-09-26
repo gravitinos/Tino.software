@@ -23,7 +23,11 @@ const link =
 function statsLine(gh: GitHubStats) {
   return statItems(gh)
     .filter((item) => !item.label.startsWith("contributions"))
-    .map((item) => (item.label === "since" ? `since ${item.value}` : `${item.value} ${item.label}`))
+    .map((item) => {
+      if (item.label === "since") return `since ${item.value}`
+      const label = item.value === "1" ? item.label.replace(/s$/, "") : item.label
+      return `${item.value} ${label}`
+    })
     .join(" · ")
 }
 
