@@ -8,6 +8,7 @@ import {
   getGitHubStats,
   GITHUB_URL,
   GITHUB_USER,
+  LINKEDIN_URL,
   type GitHubStats,
 } from "@/lib/github"
 import { formatCompact, homeMarkdown, statItems } from "@/lib/markdown"
@@ -49,6 +50,10 @@ export default async function Page() {
                 Software.{" "}
                 <a className={link} href={GITHUB_URL} rel="noreferrer" target="_blank">
                   github.com/{GITHUB_USER}
+                </a>
+                {" · "}
+                <a className={link} href={LINKEDIN_URL} rel="noreferrer" target="_blank">
+                  linkedin
                 </a>
               </p>
               <p>
@@ -92,6 +97,14 @@ export default async function Page() {
             </Link>
             <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
               github
+            </a>
+            <a
+              className="hover:text-foreground"
+              href={LINKEDIN_URL}
+              rel="noreferrer"
+              target="_blank"
+            >
+              linkedin
             </a>
           </span>
         </footer>

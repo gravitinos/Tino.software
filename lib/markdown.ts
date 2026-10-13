@@ -5,6 +5,7 @@ import {
   BUILD_URL,
   GITHUB_URL,
   GITHUB_USER,
+  LINKEDIN_URL,
   type GitHubStats,
 } from "@/lib/github"
 
@@ -42,7 +43,7 @@ function weekly(gh: GitHubStats) {
 export function homeMarkdown(gh: GitHubStats) {
   const parts = [
     "# tino",
-    `Software. [github.com/${GITHUB_USER}](${GITHUB_URL})`,
+    `Software. [github.com/${GITHUB_USER}](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`,
     `Experiments: [tino.build](${BUILD_URL})`,
   ]
 
@@ -68,7 +69,7 @@ export function homeMarkdown(gh: GitHubStats) {
 
   parts.push(
     "---",
-    `tino.software · [site info](/site) · [github](${GITHUB_URL})`
+    `tino.software · [site info](/site) · [github](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`
   )
 
   return parts.join("\n\n") + "\n"

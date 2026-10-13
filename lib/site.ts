@@ -5,7 +5,7 @@ import {
   asciiTree,
 } from "@/registry/default/graph-knap/graphs"
 
-import { GITHUB_URL } from "@/lib/github"
+import { GITHUB_URL, LINKEDIN_URL } from "@/lib/github"
 
 /** Content of /site, shared by the HTML page and its markdown twin. */
 
@@ -90,7 +90,7 @@ export function siteMarkdown() {
     "Every page renders as HTML and as markdown.",
     fence(asciiSpec({ title: "Markdown", rows: views })),
     "---",
-    `tino.software · [github](${GITHUB_URL})`,
+    `tino.software · [github](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`,
   ]
 
   return parts.join("\n\n") + "\n"

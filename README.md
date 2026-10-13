@@ -40,7 +40,9 @@ CI runs it on every PR and posts the screenshots and video as a comment
 `lib/github.ts` pulls profile, repos, and recent public events for `gravitinos`.
 Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
 otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
-also lifts the 60 req/h unauthenticated rate limit.
+also lifts the 60 req/h unauthenticated rate limit, and the repo count becomes
+`public_repos + total_private_repos` from authenticated `/user`. If the token is
+rejected (401/403), the server logs the failure and falls back to public data.
 
 The "last commit" timer takes the newest of the most recently pushed repo's
 `pushed_at` (updates immediately) and the newest push event (can lag by hours,
