@@ -6,8 +6,14 @@ const MARKDOWN: Record<string, string> = {
   "/site": "/site.md",
 }
 
+const MD_HOST = "tino.md"
+
 // Terminal clients: they send a wildcard Accept but have no use for HTML.
 const CLI = /^(curl|wget|httpie|xh|fetch)\b/i
+
+function hostname(request: NextRequest) {
+  return (request.headers.get("host") ?? "").split(":")[0]!.toLowerCase()
+}
 
 /** Serves the markdown twin when the client asks for it or is a terminal. */
 function wantsMarkdown(request: NextRequest) {
@@ -17,8 +23,38 @@ function wantsMarkdown(request: NextRequest) {
   return CLI.test(request.headers.get("user-agent") ?? "")
 }
 
+function notFoundMarkdown() {
+  return new NextResponse("# Not Found\n", {
+    status: 404,
+    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+  })
+}
+
+/**
+ * Host-based markdown site (tino.md) and Accept/UA negotiation (tino.software).
+ * www.tino.md always redirects to tino.md.
+ */
 export function proxy(request: NextRequest) {
-  const markdown = MARKDOWN[request.nextUrl.pathname]
+  const host = hostname(request)
+  const { pathname } = request.nextUrl
+
+  if (host === `www.${MD_HOST}`) {
+    const url = request.nextUrl.clone()
+    url.hostname = MD_HOST
+    url.protocol = "https:"
+    url.port = ""
+    return NextResponse.redirect(url, 308)
+  }
+
+  if (host === MD_HOST) {
+    const markdown = MARKDOWN[pathname]
+    if (!markdown) return notFoundMarkdown()
+    return NextResponse.rewrite(new URL(markdown, request.url))
+  }
+
+  const markdown = MARKDOWN[pathname]
+  if (!markdown) return NextResponse.next()
+
   const response = wantsMarkdown(request)
     ? NextResponse.rewrite(new URL(markdown, request.url))
     : NextResponse.next()
@@ -28,5 +64,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/site"],
+  // Page routes only. Skip Next internals and any path with a file extension
+  // (favicon, images, explicit `/index.md` handlers, etc.).
+  matcher: ["/", "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 }

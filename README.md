@@ -30,10 +30,11 @@ violations and "good" Core Web Vitals. It writes screenshots to
 ```bash
 bun run build && bun run test:home
 BASE_URL=https://tino.software bun run test:home   # check a deployment
+bun run test:tino-md                               # Host: tino.md rewrite/404/redirect
 ```
 
-CI runs it on every PR and posts the screenshots and video as a comment
-(media is stored on the `pr-media` branch).
+CI runs `test:home` on every PR and posts the screenshots and video as a
+comment (media is stored on the `pr-media` branch).
 
 ## GitHub stats
 
@@ -56,11 +57,26 @@ If GitHub is unreachable, the stats block is hidden.
 Every page renders an HTML and a raw-markdown version; the `[ html / md ]`
 switch (or `m`, or `?view=md`) flips `data-view` on `<html>`. An inline script
 applies the saved choice before first paint. The home page markdown is also
-served at `/index.md`.
+served at `/index.md` (and `/site` at `/site.md`), each with
+`Content-Type: text/markdown; charset=utf-8`.
 
 `proxy.ts` serves the markdown twin at the page's own URL when the request
 asks for `text/markdown` or comes from a terminal client (`curl`, `wget`,
 HTTPie, `xh`), so `curl tino.software` prints markdown. Browsers still get HTML.
+
+### tino.md
+
+[tino.md](https://tino.md) is the same content as raw markdown. When the
+request `Host` is `tino.md` (or `www.tino.md`), `proxy.ts` rewrites paths that
+have a markdown twin (`/` → `/index.md`, `/site` → `/site.md`) and returns
+those handlers as-is. Paths without a twin get a clean `404` markdown body.
+`www.tino.md` permanently redirects to `tino.md`. Behavior on
+`tino.software` is unchanged.
+
+```bash
+curl -sS https://tino.md
+curl -sS -H 'Host: tino.md' http://localhost:3000/site
+```
 
 ## Link previews
 
