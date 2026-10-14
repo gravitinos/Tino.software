@@ -34,6 +34,9 @@ jobs:
           bunx agent-browser install
       - run: bun run build
 
+      - name: test:tino-md
+        run: bun run test:tino-md
+
       - name: test:home
         run: |
           set -o pipefail
