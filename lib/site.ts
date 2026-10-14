@@ -96,7 +96,8 @@ export function siteMarkdown(surface: MarkdownSurface = "software") {
     "Every page renders as HTML and as markdown.",
     fence(asciiSpec({ title: "Markdown", rows: views })),
     "---",
-    `${brand} · [github](${GITHUB_URL}) · ${crossLinkFooter("/site", surface)}`,
+    `${brand} · [github](${GITHUB_URL})`,
+    crossLinkFooter("/site", surface),
   ]
 
   return parts.join("\n\n") + "\n"
