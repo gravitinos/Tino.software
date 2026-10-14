@@ -66,16 +66,21 @@ HTTPie, `xh`), so `curl tino.software` prints markdown. Browsers still get HTML.
 
 ### tino.md
 
-[tino.md](https://tino.md) is the same content as raw markdown. When the
-request `Host` is `tino.md` (or `www.tino.md`), `proxy.ts` rewrites paths that
-have a markdown twin (`/` → `/index.md`, `/site` → `/site.md`) and returns
-those handlers as-is. Paths without a twin get a clean `404` markdown body.
-`www.tino.md` permanently redirects to `tino.md`. Behavior on
-`tino.software` is unchanged.
+[tino.md](https://tino.md) is the canonical markdown twin of tino.software.
+When the request `Host` is `tino.md` (or `www.tino.md`), `proxy.ts` maps any
+path `P` to the existing markdown route for `P` (`/` → `/index.md`,
+`/site` → `/site.md`, `/foo` → `/foo.md` when that handler exists) and returns
+it as-is. Explicit `/foo.md` paths work the same way. Unknown paths get a
+clean `404` markdown body. `www.tino.md` permanently redirects to `tino.md`.
+
+Markdown served on tino.software links to the matching tino.md URL; markdown
+on tino.md links back to the HTML page on tino.software and uses tino.md paths
+between pages. HTML behavior on tino.software is unchanged.
 
 ```bash
 curl -sS https://tino.md
 curl -sS -H 'Host: tino.md' http://localhost:3000/site
+curl -sS -H 'Host: tino.md' http://localhost:3000/site.md
 ```
 
 ## Link previews

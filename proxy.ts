@@ -1,12 +1,9 @@
+import { existsSync } from "node:fs"
+import { join } from "node:path"
+
 import { NextResponse, type NextRequest } from "next/server"
 
-/** Pages with a markdown twin. */
-const MARKDOWN: Record<string, string> = {
-  "/": "/index.md",
-  "/site": "/site.md",
-}
-
-const MD_HOST = "tino.md"
+import { MD_HOST, toMarkdownPath } from "@/lib/markdown-twin"
 
 // Terminal clients: they send a wildcard Accept but have no use for HTML.
 const CLI = /^(curl|wget|httpie|xh|fetch)\b/i
@@ -30,9 +27,20 @@ function notFoundMarkdown() {
   })
 }
 
+/** True when `app/<name>.md/route.ts` exists (no hardcoded path list). */
+function hasMarkdownRoute(markdownPath: string) {
+  const dir = join(process.cwd(), "app", markdownPath.slice(1))
+  return existsSync(join(dir, "route.ts"))
+}
+
 /**
  * Host-based markdown site (tino.md) and Accept/UA negotiation (tino.software).
  * www.tino.md always redirects to tino.md.
+ *
+ * On tino.md, any path P maps to the markdown twin for P (`/` → `/index.md`,
+ * `/site` → `/site.md`, …) when that route exists; unknown paths get a clean
+ * markdown 404. Explicit `/foo.md` paths are handled by the App Router (and a
+ * catch-all markdown 404).
  */
 export function proxy(request: NextRequest) {
   const host = hostname(request)
@@ -46,14 +54,14 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308)
   }
 
+  const markdown = toMarkdownPath(pathname)
+
   if (host === MD_HOST) {
-    const markdown = MARKDOWN[pathname]
-    if (!markdown) return notFoundMarkdown()
+    if (!markdown || !hasMarkdownRoute(markdown)) return notFoundMarkdown()
     return NextResponse.rewrite(new URL(markdown, request.url))
   }
 
-  const markdown = MARKDOWN[pathname]
-  if (!markdown) return NextResponse.next()
+  if (!markdown || !hasMarkdownRoute(markdown)) return NextResponse.next()
 
   const response = wantsMarkdown(request)
     ? NextResponse.rewrite(new URL(markdown, request.url))

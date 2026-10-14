@@ -7,6 +7,10 @@ import {
   GITHUB_USER,
   type GitHubStats,
 } from "@/lib/github"
+import {
+  crossLinkFooter,
+  type MarkdownSurface,
+} from "@/lib/markdown-twin"
 
 const compact = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -39,7 +43,11 @@ function weekly(gh: GitHubStats) {
   return weeks
 }
 
-export function homeMarkdown(gh: GitHubStats) {
+export function homeMarkdown(
+  gh: GitHubStats,
+  surface: MarkdownSurface = "software"
+) {
+  const brand = surface === "md" ? "tino.md" : "tino.software"
   const parts = [
     "# tino",
     `Software. [github.com/${GITHUB_USER}](${GITHUB_URL})`,
@@ -68,7 +76,7 @@ export function homeMarkdown(gh: GitHubStats) {
 
   parts.push(
     "---",
-    `tino.software · [site info](/site) · [github](${GITHUB_URL})`
+    `${brand} · [site info](/site) · [github](${GITHUB_URL}) · ${crossLinkFooter("/", surface)}`
   )
 
   return parts.join("\n\n") + "\n"

@@ -6,6 +6,10 @@ import {
 } from "@/registry/default/graph-knap/graphs"
 
 import { GITHUB_URL } from "@/lib/github"
+import {
+  crossLinkFooter,
+  type MarkdownSurface,
+} from "@/lib/markdown-twin"
 
 /** Content of /site, shared by the HTML page and its markdown twin. */
 
@@ -57,6 +61,7 @@ export const views = [
   { label: "query", value: "?view=md" },
   { label: "raw", value: "/index.md, /site.md" },
   { label: "curl", value: "curl tino.software" },
+  { label: "host", value: "tino.md (markdown twin)" },
 ]
 
 export const commands = ["$ bun install", "$ bun run dev", "$ bun run build"]
@@ -76,7 +81,8 @@ function wrap(text: string, width = 72) {
   return [...lines, line].join("\n")
 }
 
-export function siteMarkdown() {
+export function siteMarkdown(surface: MarkdownSurface = "software") {
+  const brand = surface === "md" ? "tino.md" : "tino.software"
   const parts = [
     "# site",
     "How tino.software is built. [back](/)",
@@ -90,7 +96,7 @@ export function siteMarkdown() {
     "Every page renders as HTML and as markdown.",
     fence(asciiSpec({ title: "Markdown", rows: views })),
     "---",
-    `tino.software · [github](${GITHUB_URL})`,
+    `${brand} · [github](${GITHUB_URL}) · ${crossLinkFooter("/site", surface)}`,
   ]
 
   return parts.join("\n\n") + "\n"
