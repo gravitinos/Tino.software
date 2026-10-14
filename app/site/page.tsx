@@ -4,7 +4,7 @@ import Link from "next/link"
 import { TitleTransition } from "@/components/page-transition"
 import { PixelWord } from "@/components/pixel-word"
 import { Swappable } from "@/components/view-mode"
-import { GITHUB_URL } from "@/lib/github"
+import { GITHUB_URL, LINKEDIN_URL } from "@/lib/github"
 import {
   clientParts,
   commands,
@@ -66,9 +66,19 @@ export default function Page() {
           <Link className="hover:text-foreground" href="/">
             tino.software
           </Link>
-          <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
-            github
-          </a>
+          <span className="flex gap-4">
+            <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
+              github
+            </a>
+            <a
+              className="hover:text-foreground"
+              href={LINKEDIN_URL}
+              rel="noreferrer"
+              target="_blank"
+            >
+              linkedin
+            </a>
+          </span>
         </footer>
       </Swappable>
     </div>
