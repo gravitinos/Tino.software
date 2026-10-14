@@ -38,9 +38,8 @@ function hasMarkdownRoute(markdownPath: string) {
  * www.tino.md always redirects to tino.md.
  *
  * On tino.md, any path P maps to the markdown twin for P (`/` → `/index.md`,
- * `/site` → `/site.md`, …) when that route exists; unknown paths get a clean
- * markdown 404. Explicit `/foo.md` paths are handled by the App Router (and a
- * catch-all markdown 404).
+ * `/site` → `/site.md`, …) when that route exists; unknown paths (including
+ * explicit `/foo.md`) get a clean markdown 404.
  */
 export function proxy(request: NextRequest) {
   const host = hostname(request)
@@ -54,14 +53,24 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308)
   }
 
+  // Non-markdown static files (images, favicon, …) — leave alone.
+  if (pathname.includes(".") && !pathname.endsWith(".md")) {
+    return NextResponse.next()
+  }
+
   const markdown = toMarkdownPath(pathname)
 
   if (host === MD_HOST) {
     if (!markdown || !hasMarkdownRoute(markdown)) return notFoundMarkdown()
+    // Explicit `/site.md` — hand off to the route handler.
+    if (pathname === markdown) return NextResponse.next()
     return NextResponse.rewrite(new URL(markdown, request.url))
   }
 
   if (!markdown || !hasMarkdownRoute(markdown)) return NextResponse.next()
+
+  // Explicit `/index.md` on tino.software — serve the handler as-is.
+  if (pathname === markdown) return NextResponse.next()
 
   const response = wantsMarkdown(request)
     ? NextResponse.rewrite(new URL(markdown, request.url))
@@ -72,7 +81,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Page routes only. Skip Next internals and any path with a file extension
-  // (favicon, images, explicit `/index.md` handlers, etc.).
-  matcher: ["/", "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+  // Pages and `.md` twins. Skip Next internals; other extensions are filtered
+  // in `proxy` so tino.md can return a clean markdown 404 for `/foo.md`.
+  matcher: ["/", "/((?!_next/static|_next/image).*)"],
 }

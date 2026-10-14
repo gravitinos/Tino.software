@@ -31,9 +31,13 @@ export function Swappable({
       <div className="contents in-data-[view=md]:hidden">{children}</div>
       <main className="hidden flex-1 in-data-[view=md]:block">
         <h1 className="sr-only">{title}</h1>
-        <pre className="overflow-x-auto py-20 text-sm leading-relaxed whitespace-pre text-contrast-70 sm:py-32">
+        <pre
+          tabIndex={0}
+          className="overflow-x-auto py-20 text-sm leading-relaxed whitespace-pre text-contrast-70 sm:py-32"
+        >
           {markdown}
         </pre>
+       
       </main>
     </>
   )
