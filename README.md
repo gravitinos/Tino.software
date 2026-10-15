@@ -54,11 +54,13 @@ If GitHub is unreachable, the stats block is hidden.
 
 ## Markdown view
 
-Every page renders an HTML and a raw-markdown version; the `[ html / md ]`
-switch (or `m`, or `?view=md`) flips `data-view` on `<html>`. An inline script
-applies the saved choice before first paint. The home page markdown is also
-served at `/index.md` (and `/site` at `/site.md`), each with
-`Content-Type: text/markdown; charset=utf-8`.
+Every page renders an HTML and a raw-markdown version. On tino.software, the
+`md` control in `[ html / md ]` links to the matching
+[tino.md](https://tino.md) URL (`/` → `https://tino.md/`, `/site` →
+`https://tino.md/site`). Press `m` or use `?view=md` for the in-page markdown
+preview (`data-view` on `<html>`; an inline script applies a saved choice
+before first paint). The home page markdown is also served at `/index.md`
+(and `/site` at `/site.md`), each with `Content-Type: text/markdown; charset=utf-8`.
 
 `proxy.ts` serves the markdown twin at the page's own URL when the request
 asks for `text/markdown` or comes from a terminal client (`curl`, `wget`,

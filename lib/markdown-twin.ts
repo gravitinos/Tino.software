@@ -41,6 +41,19 @@ export function toPublicPath(markdownPath: string): string {
 }
 
 /**
+ * Canonical tino.md URL for a page path on tino.software.
+ * `/` → `https://tino.md/`, `/site` → `https://tino.md/site`.
+ */
+export function toTinoMdHref(pathname: string): string {
+  if (!pathname || pathname === "/") return `https://${MD_HOST}/`
+  const path =
+    pathname.length > 1 && pathname.endsWith("/")
+      ? pathname.slice(0, -1)
+      : pathname
+  return `https://${MD_HOST}${path}`
+}
+
+/**
  * Footer line linking to the other surface with a matching path.
  * software → `markdown: [tino.md/site](https://tino.md/site)`
  * md → `html: [tino.software/site](https://tino.software/site)`

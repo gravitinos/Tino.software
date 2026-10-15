@@ -1,7 +1,9 @@
 "use client"
 
+import { usePathname } from "next/navigation"
 import { useEffect } from "react"
 
+import { toTinoMdHref } from "@/lib/markdown-twin"
 import { cn } from "@/lib/utils"
 
 type View = "html" | "md"
@@ -24,8 +26,14 @@ function toggle() {
   setView(document.documentElement.dataset.view === "md" ? "html" : "md")
 }
 
-/** Global html / markdown switch. Press `m` to toggle. */
+/**
+ * View chrome: `html` stays on this page; `md` opens the matching tino.md URL.
+ * Press `m` (or `?view=md`) for the in-page markdown preview.
+ */
 export function ViewSwitch({ className }: { className?: string }) {
+  const pathname = usePathname()
+  const mdHref = toTinoMdHref(pathname)
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key !== "m" || e.metaKey || e.ctrlKey || e.altKey) return
@@ -55,13 +63,12 @@ export function ViewSwitch({ className }: { className?: string }) {
         html
       </button>
       <span className="text-graph-frame">/</span>
-      <button
-        type="button"
-        onClick={() => setView("md")}
+      <a
+        href={mdHref}
         className={cn(item, "in-data-[view=md]:text-foreground")}
       >
         md
-      </button>
+      </a>
       <span className="text-graph-frame">]</span>
     </div>
   )
