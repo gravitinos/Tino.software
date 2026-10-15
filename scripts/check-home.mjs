@@ -69,13 +69,10 @@ try {
       console.log("[html] md link → https://tino.md/")
     }
 
-    ab("open", base + "/site")
-    const siteMd = evalResult(hrefJs)
-    if (siteMd !== "https://tino.md/site") {
-      failures.push(`site md link href ${siteMd} (expected https://tino.md/site)`)
-    } else {
-      console.log("[site] md link → https://tino.md/site")
-    }
+    const siteInfo = evalResult(
+      '!!document.querySelector(\'a[href="/site"], a[href$="/site"]\')'
+    )
+    if (siteInfo) failures.push("html still links to /site")
   }
 
   for (const view of VIEWS) {

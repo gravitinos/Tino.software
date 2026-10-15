@@ -56,11 +56,11 @@ If GitHub is unreachable, the stats block is hidden.
 
 Every page renders an HTML and a raw-markdown version. On tino.software, the
 `md` control in `[ html / md ]` links to the matching
-[tino.md](https://tino.md) URL (`/` → `https://tino.md/`, `/site` →
-`https://tino.md/site`). Press `m` or use `?view=md` for the in-page markdown
-preview (`data-view` on `<html>`; an inline script applies a saved choice
-before first paint). The home page markdown is also served at `/index.md`
-(and `/site` at `/site.md`), each with `Content-Type: text/markdown; charset=utf-8`.
+[tino.md](https://tino.md) URL (`/` → `https://tino.md/`). Press `m` or use
+`?view=md` for the in-page markdown preview (`data-view` on `<html>`; an
+inline script applies a saved choice before first paint). The home page
+markdown is also served at `/index.md` with
+`Content-Type: text/markdown; charset=utf-8`.
 
 `proxy.ts` serves the markdown twin at the page's own URL when the request
 asks for `text/markdown` or comes from a terminal client (`curl`, `wget`,
@@ -71,18 +71,18 @@ HTTPie, `xh`), so `curl tino.software` prints markdown. Browsers still get HTML.
 [tino.md](https://tino.md) is the canonical markdown twin of tino.software.
 When the request `Host` is `tino.md` (or `www.tino.md`), `proxy.ts` maps any
 path `P` to the existing markdown route for `P` (`/` → `/index.md`,
-`/site` → `/site.md`, `/foo` → `/foo.md` when that handler exists) and returns
-it as-is. Explicit `/foo.md` paths work the same way. Unknown paths get a
-clean `404` markdown body. `www.tino.md` permanently redirects to `tino.md`.
+`/foo` → `/foo.md` when that handler exists) and returns it as-is. Explicit
+`/foo.md` paths work the same way. Unknown paths get a clean `404` markdown
+body. `www.tino.md` permanently redirects to `tino.md`.
 
 Markdown served on tino.software links to the matching tino.md URL; markdown
-on tino.md links back to the HTML page on tino.software and uses tino.md paths
-between pages. HTML behavior on tino.software is unchanged.
+on tino.md links back to the HTML page on tino.software. HTML negotiation on
+tino.software is unchanged.
 
 ```bash
 curl -sS https://tino.md
-curl -sS -H 'Host: tino.md' http://localhost:3000/site
-curl -sS -H 'Host: tino.md' http://localhost:3000/site.md
+curl -sS -H 'Host: tino.md' http://localhost:3000/
+curl -sS -H 'Host: tino.md' http://localhost:3000/index.md
 ```
 
 ## Link previews

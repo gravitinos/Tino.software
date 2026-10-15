@@ -13,7 +13,7 @@ export function markdownSurface(hostHeader: string | null): MarkdownSurface {
 
 /**
  * Map a public path to its markdown twin route.
- * `/` → `/index.md`, `/site` → `/site.md`, `/foo.md` → `/foo.md`.
+ * `/` → `/index.md`, `/foo` → `/foo.md`, `/foo.md` → `/foo.md`.
  * Returns null for paths that cannot be a markdown twin.
  */
 export function toMarkdownPath(pathname: string): string | null {
@@ -33,7 +33,7 @@ export function toMarkdownPath(pathname: string): string | null {
   return `${path}.md`
 }
 
-/** `/index.md` → `/`, `/site.md` → `/site`. */
+/** `/index.md` → `/`, `/foo.md` → `/foo`. */
 export function toPublicPath(markdownPath: string): string {
   if (markdownPath === "/index.md") return "/"
   if (markdownPath.endsWith(".md")) return markdownPath.slice(0, -3)
@@ -42,7 +42,7 @@ export function toPublicPath(markdownPath: string): string {
 
 /**
  * Canonical tino.md URL for a page path on tino.software.
- * `/` → `https://tino.md/`, `/site` → `https://tino.md/site`.
+ * `/` → `https://tino.md/`, `/foo` → `https://tino.md/foo`.
  */
 export function toTinoMdHref(pathname: string): string {
   if (!pathname || pathname === "/") return `https://${MD_HOST}/`
@@ -55,8 +55,8 @@ export function toTinoMdHref(pathname: string): string {
 
 /**
  * Footer line linking to the other surface with a matching path.
- * software → `markdown: [tino.md/site](https://tino.md/site)`
- * md → `html: [tino.software/site](https://tino.software/site)`
+ * software → `markdown: [tino.md](https://tino.md)`
+ * md → `html: [tino.software](https://tino.software)`
  */
 export function crossLinkFooter(
   publicPath: string,

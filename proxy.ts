@@ -38,7 +38,7 @@ function hasMarkdownRoute(markdownPath: string) {
  * www.tino.md always redirects to tino.md.
  *
  * On tino.md, any path P maps to the markdown twin for P (`/` → `/index.md`,
- * `/site` → `/site.md`, …) when that route exists; unknown paths (including
+ * `/foo` → `/foo.md`, …) when that route exists; unknown paths (including
  * explicit `/foo.md`) get a clean markdown 404.
  */
 export function proxy(request: NextRequest) {
@@ -62,7 +62,7 @@ export function proxy(request: NextRequest) {
 
   if (host === MD_HOST) {
     if (!markdown || !hasMarkdownRoute(markdown)) return notFoundMarkdown()
-    // Explicit `/site.md` — hand off to the route handler.
+    // Explicit `/index.md` — hand off to the route handler.
     if (pathname === markdown) return NextResponse.next()
     return NextResponse.rewrite(new URL(markdown, request.url))
   }
