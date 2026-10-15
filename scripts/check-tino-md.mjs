@@ -66,6 +66,24 @@ try {
     if (/\/site\b/.test(r.body)) {
       failures.push("tino.md / still references /site")
     }
+    if (!/### Last 30 days/.test(r.body)) {
+      failures.push("tino.md / missing Last 30 days section")
+    }
+    if (!/\|\s*Date\s*\|\s*Contributions\s*\|/.test(r.body)) {
+      failures.push("tino.md / missing last-30-days table header")
+    }
+    if (!/Busiest day:/i.test(r.body)) {
+      failures.push("tino.md / missing busiest day")
+    }
+    if (!/Current streak:/i.test(r.body) || !/Longest streak:/i.test(r.body)) {
+      failures.push("tino.md / missing streak lines")
+    }
+    if (!/### By month/.test(r.body)) {
+      failures.push("tino.md / missing monthly totals section")
+    }
+    if (!/\|\s*Month\s*\|\s*Contributions\s*\|/.test(r.body)) {
+      failures.push("tino.md / missing monthly table header")
+    }
   }
 
   {
@@ -131,6 +149,9 @@ try {
     }
     if (/\/site\b/.test(r.body)) {
       failures.push("localhost /index.md still references /site")
+    }
+    if (!/### Last 30 days/.test(r.body) || !/Current streak:/i.test(r.body)) {
+      failures.push("localhost /index.md missing contribution detail tables")
     }
   }
 

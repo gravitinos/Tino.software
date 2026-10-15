@@ -73,6 +73,38 @@ try {
       '!!document.querySelector(\'a[href="/site"], a[href$="/site"]\')'
     )
     if (siteInfo) failures.push("html still links to /site")
+
+    // Contribution grid: accessible cells + less/more legend.
+    const gridOk = evalResult(
+      '!!document.querySelector(\'[role="grid"][aria-label*="contributions"]\')'
+    )
+    if (!gridOk) failures.push("html missing contributions grid")
+    const cellOk = evalResult(
+      '!!document.querySelector(\'[role="grid"] [role="gridcell"][aria-label*="contribution"]\')'
+    )
+    if (!cellOk) failures.push("html missing labeled contribution cells")
+    const legend = evalResult(
+      'document.body.innerText.includes("Less") && document.body.innerText.includes("More")'
+    )
+    if (!legend) failures.push("html missing Less/More contribution legend")
+
+    evalResult(`(() => {
+      const cell = document.querySelector('[role="grid"] button[role="gridcell"]');
+      cell?.focus();
+      return !!cell;
+    })()`)
+    ab("wait", "300")
+    const readout = evalResult(`(() => {
+      const live = document.querySelector('[role="grid"][aria-describedby]');
+      const id = live?.getAttribute('aria-describedby');
+      const label = id ? document.getElementById(id)?.textContent?.trim() : '';
+      return label && /contribution/i.test(label) ? label : null;
+    })()`)
+    if (!readout) {
+      failures.push("html contribution cell focus did not update day readout")
+    } else {
+      console.log(`[html] contribution readout → ${readout}`)
+    }
   }
 
   for (const view of VIEWS) {

@@ -43,6 +43,13 @@ Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
 otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
 also lifts the 60 req/h unauthenticated rate limit.
 
+The year grid (`registry/tino/graph-year`) shows each day as a square. Hover,
+focus, or tap a cell for a readout like `Oct 12 · 14 contributions`; arrow keys
+move with a roving tabindex. Phones show the last 26 weeks. A less→more legend
+sits under the grid. The markdown twin keeps the weekly sparkline and adds
+plain-text tables: last 30 days, busiest day, current/longest streak, and
+monthly totals (`lib/contributions.ts`, rendered from `lib/markdown.ts`).
+
 The "last commit" timer takes the newest of the most recently pushed repo's
 `pushed_at` (updates immediately) and the newest push event (can lag by hours,
 but covers repos the user doesn't own). Those two small requests refresh every
