@@ -1,12 +1,9 @@
+import { existsSync } from "node:fs"
+import { join } from "node:path"
+
 import { NextResponse, type NextRequest } from "next/server"
 
-/** Pages with a markdown twin. */
-const MARKDOWN: Record<string, string> = {
-  "/": "/index.md",
-  "/site": "/site.md",
-}
-
-const MD_HOST = "tino.md"
+import { MD_HOST, toMarkdownPath } from "@/lib/markdown-twin"
 
 // Terminal clients: they send a wildcard Accept but have no use for HTML.
 const CLI = /^(curl|wget|httpie|xh|fetch)\b/i
@@ -30,9 +27,19 @@ function notFoundMarkdown() {
   })
 }
 
+/** True when `app/<name>.md/route.ts` exists (no hardcoded path list). */
+function hasMarkdownRoute(markdownPath: string) {
+  const dir = join(process.cwd(), "app", markdownPath.slice(1))
+  return existsSync(join(dir, "route.ts"))
+}
+
 /**
  * Host-based markdown site (tino.md) and Accept/UA negotiation (tino.software).
  * www.tino.md always redirects to tino.md.
+ *
+ * On tino.md, any path P maps to the markdown twin for P (`/` → `/index.md`,
+ * `/site` → `/site.md`, …) when that route exists; unknown paths (including
+ * explicit `/foo.md`) get a clean markdown 404.
  */
 export function proxy(request: NextRequest) {
   const host = hostname(request)
@@ -46,14 +53,24 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308)
   }
 
+  // Non-markdown static files (images, favicon, …) — leave alone.
+  if (pathname.includes(".") && !pathname.endsWith(".md")) {
+    return NextResponse.next()
+  }
+
+  const markdown = toMarkdownPath(pathname)
+
   if (host === MD_HOST) {
-    const markdown = MARKDOWN[pathname]
-    if (!markdown) return notFoundMarkdown()
+    if (!markdown || !hasMarkdownRoute(markdown)) return notFoundMarkdown()
+    // Explicit `/site.md` — hand off to the route handler.
+    if (pathname === markdown) return NextResponse.next()
     return NextResponse.rewrite(new URL(markdown, request.url))
   }
 
-  const markdown = MARKDOWN[pathname]
-  if (!markdown) return NextResponse.next()
+  if (!markdown || !hasMarkdownRoute(markdown)) return NextResponse.next()
+
+  // Explicit `/index.md` on tino.software — serve the handler as-is.
+  if (pathname === markdown) return NextResponse.next()
 
   const response = wantsMarkdown(request)
     ? NextResponse.rewrite(new URL(markdown, request.url))
@@ -64,7 +81,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Page routes only. Skip Next internals and any path with a file extension
-  // (favicon, images, explicit `/index.md` handlers, etc.).
-  matcher: ["/", "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+  // Pages and `.md` twins. Skip Next internals; other extensions are filtered
+  // in `proxy` so tino.md can return a clean markdown 404 for `/foo.md`.
+  matcher: ["/", "/((?!_next/static|_next/image).*)"],
 }
