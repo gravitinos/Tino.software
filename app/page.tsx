@@ -1,5 +1,3 @@
-import Link from "next/link"
-
 import { TitleTransition } from "@/components/page-transition"
 import { PixelWord } from "@/components/pixel-word"
 import { Swappable } from "@/components/view-mode"
@@ -86,14 +84,9 @@ export default async function Page() {
 
         <footer className="flex justify-between py-8 text-xs text-graph-muted">
           <span>tino.software</span>
-          <span className="flex gap-4">
-            <Link className="hover:text-foreground" href="/site">
-              site info
-            </Link>
-            <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
-              github
-            </a>
-          </span>
+          <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
+            github
+          </a>
         </footer>
       </Swappable>
     </div>

@@ -76,7 +76,7 @@ export function homeMarkdown(
 
   parts.push(
     "---",
-    `${brand} · [site info](/site) · [github](${GITHUB_URL})`,
+    `${brand} · [github](${GITHUB_URL})`,
     crossLinkFooter("/", surface)
   )
 

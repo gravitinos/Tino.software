@@ -63,33 +63,29 @@ try {
     if (!/^html:\s*\[tino\.software\]\(https:\/\/tino\.software\)$/m.test(r.body)) {
       failures.push("tino.md / missing html link back to tino.software")
     }
-    if (!/\[site info\]\(\/site\)/.test(r.body)) {
-      failures.push("tino.md / missing tino.md-relative link to /site")
+    if (/\/site\b/.test(r.body)) {
+      failures.push("tino.md / still references /site")
     }
-  }
-
-  {
-    const r = req(base, "/site", "tino.md")
-    if (r.status !== 200) failures.push(`tino.md /site status ${r.status}`)
-    if (r.type !== MD_TYPE) failures.push(`tino.md /site type ${r.type}`)
-    if (!/^html:\s*\[tino\.software\/site\]\(https:\/\/tino\.software\/site\)$/m.test(r.body)) {
-      failures.push("tino.md /site missing html link back to tino.software/site")
-    }
-    if (!/\[back\]\(\/\)/.test(r.body)) {
-      failures.push("tino.md /site missing tino.md-relative link to /")
-    }
-  }
-
-  {
-    const r = req(base, "/site.md", "tino.md")
-    if (r.status !== 200) failures.push(`tino.md /site.md status ${r.status}`)
-    if (r.type !== MD_TYPE) failures.push(`tino.md /site.md type ${r.type}`)
   }
 
   {
     const r = req(base, "/index.md", "tino.md")
     if (r.status !== 200) failures.push(`tino.md /index.md status ${r.status}`)
     if (r.type !== MD_TYPE) failures.push(`tino.md /index.md type ${r.type}`)
+  }
+
+  {
+    const r = req(base, "/site", "tino.md")
+    if (r.status !== 404) failures.push(`tino.md /site status ${r.status}`)
+    if (r.type !== MD_TYPE) failures.push(`tino.md /site type ${r.type}`)
+    if (r.body.includes("<html")) failures.push("tino.md /site returned HTML")
+  }
+
+  {
+    const r = req(base, "/site.md", "tino.md")
+    if (r.status !== 404) failures.push(`tino.md /site.md status ${r.status}`)
+    if (r.type !== MD_TYPE) failures.push(`tino.md /site.md type ${r.type}`)
+    if (r.body.includes("<html")) failures.push("tino.md /site.md returned HTML")
   }
 
   {
@@ -107,9 +103,9 @@ try {
   }
 
   {
-    const r = req(base, "/site?x=1", "www.tino.md")
+    const r = req(base, "/foo?x=1", "www.tino.md")
     if (r.status !== 308) failures.push(`www.tino.md status ${r.status}`)
-    if (!r.location?.startsWith("https://tino.md/site")) {
+    if (!r.location?.startsWith("https://tino.md/foo")) {
       failures.push(`www.tino.md location ${r.location}`)
     }
   }
@@ -127,27 +123,20 @@ try {
   }
 
   {
-    const r = req(base, "/site", "localhost", { accept: "text/markdown" })
-    if (r.status !== 200) failures.push(`localhost Accept md /site status ${r.status}`)
-    if (r.type !== MD_TYPE) failures.push(`localhost Accept md /site type ${r.type}`)
-  }
-
-  {
     const r = req(base, "/index.md", "localhost")
     if (r.status !== 200) failures.push(`localhost /index.md status ${r.status}`)
     if (r.type !== MD_TYPE) failures.push(`localhost /index.md type ${r.type}`)
     if (!/^markdown:\s*\[tino\.md\]\(https:\/\/tino\.md\)$/m.test(r.body)) {
       failures.push("localhost /index.md missing markdown link to tino.md")
     }
+    if (/\/site\b/.test(r.body)) {
+      failures.push("localhost /index.md still references /site")
+    }
   }
 
   {
-    const r = req(base, "/site.md", "localhost")
-    if (r.status !== 200) failures.push(`localhost /site.md status ${r.status}`)
-    if (r.type !== MD_TYPE) failures.push(`localhost /site.md type ${r.type}`)
-    if (!/^markdown:\s*\[tino\.md\/site\]\(https:\/\/tino\.md\/site\)$/m.test(r.body)) {
-      failures.push("localhost /site.md missing markdown link to tino.md/site")
-    }
+    const r = req(base, "/site", "localhost", { accept: "text/html" })
+    if (r.status !== 404) failures.push(`localhost /site status ${r.status}`)
   }
 
   if (failures.length) {
