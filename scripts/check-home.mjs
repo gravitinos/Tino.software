@@ -29,6 +29,12 @@ function ab(...args) {
   return args.includes("--json") ? JSON.parse(out) : out
 }
 
+/** Run page JS; returns the eval result (avoids shell-quoting issues). */
+function evalResult(js) {
+  const b64 = Buffer.from(js).toString("base64")
+  return ab("eval", "-b", b64, "--json").data.result
+}
+
 async function startServer() {
   const port = process.env.PORT ?? "3123"
   const server = spawn("node_modules/.bin/next", ["start", "-p", port], {
@@ -53,12 +59,10 @@ mkdirSync(OUT, { recursive: true })
 try {
   // Top-right `md` must point at the tino.md twin, not a same-origin .md route.
   {
+    const hrefJs =
+      'document.querySelector(\'a[href^="https://tino.md"]\')?.getAttribute("href")'
     ab("open", base + "/")
-    const homeMd = ab(
-      "eval",
-      `document.querySelector('a[href^="https://tino.md"]')?.getAttribute("href")`,
-      "--json"
-    ).data
+    const homeMd = evalResult(hrefJs)
     if (homeMd !== "https://tino.md/") {
       failures.push(`html md link href ${homeMd} (expected https://tino.md/)`)
     } else {
@@ -66,11 +70,7 @@ try {
     }
 
     ab("open", base + "/site")
-    const siteMd = ab(
-      "eval",
-      `document.querySelector('a[href^="https://tino.md"]')?.getAttribute("href")`,
-      "--json"
-    ).data
+    const siteMd = evalResult(hrefJs)
     if (siteMd !== "https://tino.md/site") {
       failures.push(`site md link href ${siteMd} (expected https://tino.md/site)`)
     } else {
