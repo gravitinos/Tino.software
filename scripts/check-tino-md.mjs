@@ -121,6 +121,18 @@ try {
   }
 
   {
+    const r = req(base, "/", "localhost", { accept: "text/markdown" })
+    if (r.status !== 200) failures.push(`localhost Accept md / status ${r.status}`)
+    if (r.type !== MD_TYPE) failures.push(`localhost Accept md / type ${r.type}`)
+  }
+
+  {
+    const r = req(base, "/site", "localhost", { accept: "text/markdown" })
+    if (r.status !== 200) failures.push(`localhost Accept md /site status ${r.status}`)
+    if (r.type !== MD_TYPE) failures.push(`localhost Accept md /site type ${r.type}`)
+  }
+
+  {
     const r = req(base, "/index.md", "localhost")
     if (r.status !== 200) failures.push(`localhost /index.md status ${r.status}`)
     if (r.type !== MD_TYPE) failures.push(`localhost /index.md type ${r.type}`)

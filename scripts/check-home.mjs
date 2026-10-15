@@ -51,6 +51,33 @@ const failures = []
 mkdirSync(OUT, { recursive: true })
 
 try {
+  // Top-right `md` must point at the tino.md twin, not a same-origin .md route.
+  {
+    ab("open", base + "/")
+    const homeMd = ab(
+      "eval",
+      `document.querySelector('a[href^="https://tino.md"]')?.getAttribute("href")`,
+      "--json"
+    ).data
+    if (homeMd !== "https://tino.md/") {
+      failures.push(`html md link href ${homeMd} (expected https://tino.md/)`)
+    } else {
+      console.log("[html] md link → https://tino.md/")
+    }
+
+    ab("open", base + "/site")
+    const siteMd = ab(
+      "eval",
+      `document.querySelector('a[href^="https://tino.md"]')?.getAttribute("href")`,
+      "--json"
+    ).data
+    if (siteMd !== "https://tino.md/site") {
+      failures.push(`site md link href ${siteMd} (expected https://tino.md/site)`)
+    } else {
+      console.log("[site] md link → https://tino.md/site")
+    }
+  }
+
   for (const view of VIEWS) {
     const url = base + view.path
 

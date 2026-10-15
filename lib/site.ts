@@ -56,8 +56,8 @@ export const clientParts = [
 ]
 
 export const views = [
-  { label: "toggle", value: "[ html / md ], top right" },
-  { label: "key", value: "m" },
+  { label: "md link", value: "top right → tino.md" },
+  { label: "key", value: "m (in-page preview)" },
   { label: "query", value: "?view=md" },
   { label: "raw", value: "/index.md, /site.md" },
   { label: "curl", value: "curl tino.software" },
