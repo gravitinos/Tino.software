@@ -1,0 +1,36 @@
+name: ci
+
+# Lint, build, then check both views: axe a11y on the homepage and the tino.md
+# twin. Page speed is tracked from real visits, not here.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bunx agent-browser install
+      - run: bun run build
+        env:
+          # Avoids the unauthenticated GitHub API rate limit at build time.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: bun run test:tino-md
+      - run: bun run test:home
