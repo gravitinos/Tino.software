@@ -74,6 +74,31 @@ try {
     )
     if (siteInfo) failures.push("html still links to /site")
 
+    // The wordmark stays at rest when hovered or clicked and is not a control.
+    const wordmarkStyle = `(() => {
+      const title = document.querySelector('h1');
+      if (!title || title.textContent.trim().toLowerCase() !== 'tino') return null;
+      return [...title.querySelectorAll('*')].map((element) => {
+        const style = getComputedStyle(element);
+        return [style.fontFamily, style.color, style.transform, style.animationName,
+          style.transitionDuration, element.getBoundingClientRect().toJSON()];
+      });
+    })()`
+    const restingWordmark = JSON.stringify(evalResult(wordmarkStyle))
+    const wordmarkInteractive = evalResult(
+      '!!document.querySelector(\'h1 :is(button, a, [role="button"], [tabindex])\')'
+    )
+    if (restingWordmark === "null" || wordmarkInteractive) {
+      failures.push("html wordmark missing or still interactive")
+    }
+    ab("hover", "h1")
+    ab("click", "h1")
+    if (JSON.stringify(evalResult(wordmarkStyle)) !== restingWordmark) {
+      failures.push("html wordmark changed on hover/click")
+    } else {
+      console.log("[html] wordmark stays static on hover/click")
+    }
+
     // Contribution grid: accessible cells + less/more legend.
     const gridOk = evalResult(
       '!!document.querySelector(\'[role="grid"][aria-label*="contributions"]\')'

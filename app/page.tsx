@@ -1,4 +1,3 @@
-import { TitleTransition } from "@/components/page-transition"
 import { PixelWord } from "@/components/pixel-word"
 import { Swappable } from "@/components/view-mode"
 import {
@@ -38,9 +37,7 @@ export default async function Page() {
         <main data-still className="flex flex-1 flex-col gap-14 py-20 sm:gap-20 sm:py-28">
           <section className="flex flex-col gap-6">
             <h1>
-              <TitleTransition>
-                <PixelWord text="tino" className="-mb-[0.22em] text-[clamp(5rem,22vw,11rem)]" />
-              </TitleTransition>
+              <PixelWord text="tino" className="-mb-[0.22em] text-[clamp(5rem,22vw,11rem)]" />
             </h1>
             <div className="flex flex-col gap-2 text-sm text-graph-muted">
               <p>
