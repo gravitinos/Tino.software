@@ -13,6 +13,7 @@ import {
   BUILD_URL,
   GITHUB_URL,
   GITHUB_USER,
+  LINKEDIN_URL,
   type GitHubStats,
 } from "@/lib/github"
 import {
@@ -96,7 +97,7 @@ export function homeMarkdown(
   const brand = surface === "md" ? "tino.md" : "tino.software"
   const parts = [
     "# tino",
-    `Software. [github.com/${GITHUB_USER}](${GITHUB_URL})`,
+    `Software. [github.com/${GITHUB_USER}](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`,
     `Experiments: [tino.build](${BUILD_URL})`,
   ]
 
@@ -123,7 +124,7 @@ export function homeMarkdown(
 
   parts.push(
     "---",
-    `${brand} · [github](${GITHUB_URL})`,
+    `${brand} · [github](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`,
     crossLinkFooter("/", surface)
   )
 

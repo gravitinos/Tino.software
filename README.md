@@ -41,7 +41,9 @@ comment (media is stored on the `pr-media` branch).
 `lib/github.ts` pulls profile, repos, and recent public events for `gravitinos`.
 Contribution counts come from the GitHub GraphQL API when `GITHUB_TOKEN` is set,
 otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
-also lifts the 60 req/h unauthenticated rate limit.
+also lifts the 60 req/h unauthenticated rate limit, and the repo count becomes
+`public_repos + total_private_repos` from authenticated `/user`. If the token is
+rejected (401/403), the server logs the failure and falls back to public data.
 
 The year grid (`registry/tino/graph-year`) shows each day as a square. Hover,
 focus, or tap a cell for a readout like `Oct 12 · 14 contributions`; arrow keys

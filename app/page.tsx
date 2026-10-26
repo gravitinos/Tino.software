@@ -5,6 +5,7 @@ import {
   getGitHubStats,
   GITHUB_URL,
   GITHUB_USER,
+  LINKEDIN_URL,
   type GitHubStats,
 } from "@/lib/github"
 import { formatCompact, homeMarkdown, statItems } from "@/lib/markdown"
@@ -45,6 +46,10 @@ export default async function Page() {
                 <a className={link} href={GITHUB_URL} rel="noreferrer" target="_blank">
                   github.com/{GITHUB_USER}
                 </a>
+                {" · "}
+                <a className={link} href={LINKEDIN_URL} rel="noreferrer" target="_blank">
+                  linkedin
+                </a>
               </p>
               <p>
                 Experiments at{" "}
@@ -81,9 +86,19 @@ export default async function Page() {
 
         <footer className="flex justify-between py-8 text-xs text-graph-muted">
           <span>tino.software</span>
-          <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
-            github
-          </a>
+          <span className="flex gap-4">
+            <a className="hover:text-foreground" href={GITHUB_URL} rel="noreferrer" target="_blank">
+              github
+            </a>
+            <a
+              className="hover:text-foreground"
+              href={LINKEDIN_URL}
+              rel="noreferrer"
+              target="_blank"
+            >
+              linkedin
+            </a>
+          </span>
         </footer>
       </Swappable>
     </div>
