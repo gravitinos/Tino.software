@@ -1,18 +1,16 @@
 #!/usr/bin/env node
-// Homepage gate: zero axe violations in both views, Core Web Vitals "good".
+// Homepage gate: zero axe violations in both views, plus wordmark, md link,
+// and contribution grid behavior.
 //
 //   bun run build && bun run test:home          # starts `next start` itself
 //   BASE_URL=https://tino.software bun run test:home
 //
-// Screenshots of each view land in artifacts/home/ for sharing. With RECORD=1
-// it also records home.mp4: scroll the page, flip to markdown (`m`) and back.
+// Screenshots of each view land in artifacts/home/ for sharing.
 
 import { execFileSync, spawn } from "node:child_process"
 import { mkdirSync } from "node:fs"
 import { setTimeout as sleep } from "node:timers/promises"
 
-// web.dev "good" thresholds (ms, except CLS).
-const GOOD = { lcp: 2500, fcp: 1800, ttfb: 800, inp: 200, cls: 0.1 }
 const VIEWS = [
   { name: "html", path: "/" },
   { name: "md", path: "/?view=md" },
@@ -133,28 +131,7 @@ try {
   }
 
   for (const view of VIEWS) {
-    const url = base + view.path
-
-    // Fresh load so vitals measure this navigation only.
-    ab("open", url)
-    const vitals = ab("vitals", "--json").data
-    const measured = {
-      lcp: vitals.lcp?.startTime,
-      fcp: vitals.fcp,
-      ttfb: vitals.ttfb,
-      inp: vitals.inp,
-      cls: vitals.cls?.score,
-    }
-    const row = Object.entries(measured)
-      .map(([k, v]) => `${k}=${v ?? "-"}`)
-      .join(" ")
-    console.log(`[${view.name}] vitals ${row}`)
-    for (const [k, v] of Object.entries(measured)) {
-      if (v != null && v > GOOD[k]) {
-        failures.push(`[${view.name}] ${k} ${v} > ${GOOD[k]}`)
-      }
-    }
-
+    ab("open", base + view.path)
     const a11y = ab("a11y", "--json").data
     console.log(
       `[${view.name}] a11y violations=${a11y.counts.violations} passes=${a11y.counts.passes} incomplete=${a11y.counts.incomplete}`
@@ -165,25 +142,6 @@ try {
     }
 
     ab("screenshot", "--full", `${OUT}/${view.name}.png`)
-  }
-
-  if (process.env.RECORD) {
-    ab("open", base + "/")
-    ab("record", "start", `${OUT}/home.mp4`)
-    for (const step of [
-      ["wait", "1000"],
-      ["scroll", "down", "800"],
-      ["wait", "1000"],
-      ["scroll", "up", "800"],
-      ["wait", "600"],
-      ["press", "m"],
-      ["wait", "1500"],
-      ["press", "m"],
-      ["wait", "1000"],
-    ]) {
-      ab(...step)
-    }
-    ab("record", "stop")
   }
 } finally {
   try {

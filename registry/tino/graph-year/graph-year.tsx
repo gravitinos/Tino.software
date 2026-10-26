@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -67,7 +66,7 @@ function GraphYear({ title, days, caption, className }: GraphYearProps) {
   const labelId = useId()
 
   const [compact, setCompact] = useState(false)
-  const [focus, setFocus] = useState<FocusPos | null>(null)
+  const [focusState, setFocus] = useState<FocusPos | null>(null)
   const [hover, setHover] = useState<FocusPos | null>(null)
 
   useEffect(() => {
@@ -78,16 +77,13 @@ function GraphYear({ title, days, caption, className }: GraphYearProps) {
     return () => mq.removeEventListener("change", sync)
   }, [])
 
-  const weekVisible = useCallback(
-    (w: number) => !compact || w >= recent,
-    [compact, recent]
-  )
+  const weekVisible = (w: number) => !compact || w >= recent
 
-  useEffect(() => {
-    if (focus && !weekVisible(focus.week)) setFocus(null)
-  }, [focus, weekVisible])
+  // A focused day hidden by the phone layout no longer counts as focused.
+  const focus =
+    focusState && weekVisible(focusState.week) ? focusState : null
 
-  const firstFocusable = useMemo((): FocusPos | null => {
+  const firstFocusable = ((): FocusPos | null => {
     for (let w = 0; w < weeks.length; w++) {
       if (!weekVisible(w)) continue
       for (let d = 0; d < 7; d++) {
@@ -95,9 +91,9 @@ function GraphYear({ title, days, caption, className }: GraphYearProps) {
       }
     }
     return null
-  }, [weeks, weekVisible])
+  })()
 
-  const lastFocusable = useMemo((): FocusPos | null => {
+  const lastFocusable = ((): FocusPos | null => {
     for (let w = weeks.length - 1; w >= 0; w--) {
       if (!weekVisible(w)) continue
       for (let d = 6; d >= 0; d--) {
@@ -105,7 +101,7 @@ function GraphYear({ title, days, caption, className }: GraphYearProps) {
       }
     }
     return null
-  }, [weeks, weekVisible])
+  })()
 
   // Prefer the most recent day as the tab stop.
   const tabStop = focus ?? lastFocusable ?? firstFocusable
