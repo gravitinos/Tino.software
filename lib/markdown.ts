@@ -2,12 +2,24 @@ import { fence } from "@/registry/default/graph-knap/frame"
 import { asciiSpark, asciiStat } from "@/registry/default/graph-knap/graphs"
 
 import {
+  busiestDay,
+  dayLabel,
+  lastDays,
+  markdownTable,
+  monthlyTotals,
+  streaks,
+} from "@/lib/contributions"
+import {
   BUILD_URL,
   GITHUB_URL,
   GITHUB_USER,
   LINKEDIN_URL,
   type GitHubStats,
 } from "@/lib/github"
+import {
+  crossLinkFooter,
+  type MarkdownSurface,
+} from "@/lib/markdown-twin"
 
 const compact = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -40,7 +52,49 @@ function weekly(gh: GitHubStats) {
   return weeks
 }
 
-export function homeMarkdown(gh: GitHubStats) {
+function contributionDetails(gh: GitHubStats): string[] {
+  const days = gh.contributions
+  if (days.length === 0) return []
+
+  const parts: string[] = []
+  const recent = lastDays(days, 30)
+  parts.push("### Last 30 days")
+  parts.push(
+    markdownTable(
+      ["Date", "Contributions"],
+      recent.map((day) => [day.date, String(day.count)])
+    )
+  )
+
+  const busy = busiestDay(days)
+  if (busy) {
+    parts.push(`Busiest day: ${dayLabel(busy)} (\`${busy.date}\`)`)
+  }
+
+  const { current, longest } = streaks(days)
+  parts.push(
+    `Current streak: ${current} day${current === 1 ? "" : "s"} · Longest streak: ${longest} day${longest === 1 ? "" : "s"}`
+  )
+
+  const months = monthlyTotals(days)
+  if (months.length > 0) {
+    parts.push("### By month")
+    parts.push(
+      markdownTable(
+        ["Month", "Contributions"],
+        months.map((row) => [row.month, String(row.total)])
+      )
+    )
+  }
+
+  return parts
+}
+
+export function homeMarkdown(
+  gh: GitHubStats,
+  surface: MarkdownSurface = "software"
+) {
+  const brand = surface === "md" ? "tino.md" : "tino.software"
   const parts = [
     "# tino",
     `Software. [github.com/${GITHUB_USER}](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`,
@@ -64,12 +118,14 @@ export function homeMarkdown(gh: GitHubStats) {
           })
         )
       )
+      parts.push(...contributionDetails(gh))
     }
   }
 
   parts.push(
     "---",
-    `tino.software · [site info](/site) · [github](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`
+    `${brand} · [github](${GITHUB_URL}) · [linkedin](${LINKEDIN_URL})`,
+    crossLinkFooter("/", surface)
   )
 
   return parts.join("\n\n") + "\n"

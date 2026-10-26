@@ -30,10 +30,11 @@ violations and "good" Core Web Vitals. It writes screenshots to
 ```bash
 bun run build && bun run test:home
 BASE_URL=https://tino.software bun run test:home   # check a deployment
+bun run test:tino-md                               # Host: tino.md rewrite/404/redirect
 ```
 
-CI runs it on every PR and posts the screenshots and video as a comment
-(media is stored on the `pr-media` branch).
+CI runs `test:home` on every PR and posts the screenshots and video as a
+comment (media is stored on the `pr-media` branch).
 
 ## GitHub stats
 
@@ -43,6 +44,13 @@ otherwise from the public `github-contributions-api.jogruber.de` proxy. A token
 also lifts the 60 req/h unauthenticated rate limit, and the repo count becomes
 `public_repos + total_private_repos` from authenticated `/user`. If the token is
 rejected (401/403), the server logs the failure and falls back to public data.
+
+The year grid (`registry/tino/graph-year`) shows each day as a square. Hover,
+focus, or tap a cell for a readout like `Oct 12 · 14 contributions`; arrow keys
+move with a roving tabindex. Phones show the last 26 weeks. A less→more legend
+sits under the grid. The markdown twin keeps the weekly sparkline and adds
+plain-text tables: last 30 days, busiest day, current/longest streak, and
+monthly totals (`lib/contributions.ts`, rendered from `lib/markdown.ts`).
 
 The "last commit" timer takes the newest of the most recently pushed repo's
 `pushed_at` (updates immediately) and the newest push event (can lag by hours,
@@ -55,14 +63,36 @@ If GitHub is unreachable, the stats block is hidden.
 
 ## Markdown view
 
-Every page renders an HTML and a raw-markdown version; the `[ html / md ]`
-switch (or `m`, or `?view=md`) flips `data-view` on `<html>`. An inline script
-applies the saved choice before first paint. The home page markdown is also
-served at `/index.md`.
+Every page renders an HTML and a raw-markdown version. On tino.software, the
+`md` control in `[ html / md ]` links to the matching
+[tino.md](https://tino.md) URL (`/` → `https://tino.md/`). Press `m` or use
+`?view=md` for the in-page markdown preview (`data-view` on `<html>`; an
+inline script applies a saved choice before first paint). The home page
+markdown is also served at `/index.md` with
+`Content-Type: text/markdown; charset=utf-8`.
 
 `proxy.ts` serves the markdown twin at the page's own URL when the request
 asks for `text/markdown` or comes from a terminal client (`curl`, `wget`,
 HTTPie, `xh`), so `curl tino.software` prints markdown. Browsers still get HTML.
+
+### tino.md
+
+[tino.md](https://tino.md) is the canonical markdown twin of tino.software.
+When the request `Host` is `tino.md` (or `www.tino.md`), `proxy.ts` maps any
+path `P` to the existing markdown route for `P` (`/` → `/index.md`,
+`/foo` → `/foo.md` when that handler exists) and returns it as-is. Explicit
+`/foo.md` paths work the same way. Unknown paths get a clean `404` markdown
+body. `www.tino.md` permanently redirects to `tino.md`.
+
+Markdown served on tino.software links to the matching tino.md URL; markdown
+on tino.md links back to the HTML page on tino.software. HTML negotiation on
+tino.software is unchanged.
+
+```bash
+curl -sS https://tino.md
+curl -sS -H 'Host: tino.md' http://localhost:3000/
+curl -sS -H 'Host: tino.md' http://localhost:3000/index.md
+```
 
 ## Link previews
 
