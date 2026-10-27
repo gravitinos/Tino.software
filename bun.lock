@@ -6,6 +6,7 @@
       "name": "app",
       "dependencies": {
         "@base-ui/react": "^1.8.0",
+        "@tanstack/redact": "^0.2.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "geist": "^1.7.2",
@@ -245,6 +246,8 @@
     "@tailwindcss/oxide-win32-x64-msvc": ["@tailwindcss/oxide-win32-x64-msvc@4.3.3", "", { "os": "win32", "cpu": "x64" }, "sha512-yJ0pwIVc/nYeGoV02WtsN8KYyLQv7kyI2wDnkezyJlGGjkd4QLwDGAwl47YpPJeuI0M0ObaXGSPjvWDPeTPggw=="],
 
     "@tailwindcss/postcss": ["@tailwindcss/postcss@4.3.3", "", { "dependencies": { "@alloc/quick-lru": "^5.2.0", "@tailwindcss/node": "4.3.3", "@tailwindcss/oxide": "4.3.3", "postcss": "^8.5.16", "tailwindcss": "4.3.3" } }, "sha512-JTSZZGQi1AyKirbLN3azmjVzef92tcX7h+iSqPdaeStyFpGpDlKvvpxeOE8njhbUanbRwr3z8DyzhICWnMtQeg=="],
+
+    "@tanstack/redact": ["@tanstack/redact@0.2.0", "", { "peerDependencies": { "@cloudflare/vite-plugin": "1.65.0", "next": "~15.5.0 || ~16.0.0 || ~16.1.0 || ~16.2.0 || ~16.3.0 || ~16.4.0", "vinext": "~1.3.0", "vite": ">=5" }, "optionalPeers": ["@cloudflare/vite-plugin", "next", "vinext", "vite"] }, "sha512-shm9huNXu9mtNqPyXeF6PJDSTm7cI4RgjB7K5k6LJzx2U5xfAPOjEA5EtE+RLSwY2nAq2OeaaIoHT6nSPEawJg=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.4", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-W3c4gRigFS0T/Ma4qIYF3GDAc5AQdHb1yL5znJT1Zv1YaD9Kitx656wBjvr19qbiosmZT8lWDM5BEMynUqX65A=="],
 
