@@ -1,0 +1,38 @@
+# WHY: Vercel blocks Git-triggered deploys for commits whose GitHub login maps to a
+# Vercel user outside the team. A token deploy is attributed to the token owner.
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-vercel-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  deploy:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_ORG_ID: team_JzKrPMJFuknTe32xyh2yhk2S
+      VERCEL_PROJECT_ID: prj_7oaWS2F0gceKOK8xYohJf4U060z6
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      PRODUCTION: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Deploy
+        run: |
+          args=(--yes --scope gravitinos)
+          if [ "$PRODUCTION" = "true" ]; then args+=(--prod); fi
+          url=$(bunx vercel@65.12.1 deploy "${args[@]}")
+          echo "Deployed: $url" >> "$GITHUB_STEP_SUMMARY"
